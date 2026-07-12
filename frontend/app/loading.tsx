@@ -1,0 +1,1 @@
+export default function Loading(){return <div className="appstate" role="status" aria-live="polite"><span className="statepulse" aria-hidden="true"/><div><b>Preparing intelligence workspace</b><p>Loading the latest available evidence and interface state…</p></div></div>}

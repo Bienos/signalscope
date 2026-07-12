@@ -1,0 +1,2 @@
+'use client';
+export default function ErrorState({reset}:{error:Error&{digest?:string};reset:()=>void}){return <div className="appstate errorstate" role="alert"><span aria-hidden="true">!</span><div><b>This view could not be prepared</b><p>Your data has not been changed. Try the view again or check Data health if the problem continues.</p><button className="action" onClick={reset}>Try again</button></div></div>}
