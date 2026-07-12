@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment: {POSTGRES_DB: radar, POSTGRES_USER: radar, POSTGRES_PASSWORD: radar}
+    ports: ["5432:5432"]
+    healthcheck: {test: ["CMD-SHELL", "pg_isready -U radar"], interval: 3s, timeout: 3s, retries: 20}
+  api:
+    build: ./backend
+    env_file: .env
+    environment: {DATABASE_URL: postgresql+psycopg://radar:radar@db:5432/radar}
+    ports: ["8000:8000"]
+    volumes: ["./outputs:/app/outputs", "./data:/app/data"]
+    depends_on: {db: {condition: service_healthy}}
+  web:
+    build: ./frontend
+    environment: {API_URL: http://api:8000, NEXT_PUBLIC_API_URL: http://localhost:8000}
+    ports: ["3000:3000"]
+    depends_on: [api]

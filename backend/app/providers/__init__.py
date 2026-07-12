@@ -1,0 +1,1 @@
+"""Authorised data provider adapters."""

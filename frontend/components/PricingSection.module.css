@@ -1,0 +1,1 @@
+.planGrid{grid-template-columns:repeat(4,1fr)!important}.limit{display:block;margin-top:12px;color:#647476}@media(max-width:1000px){.planGrid{grid-template-columns:1fr 1fr!important}}@media(max-width:620px){.planGrid{grid-template-columns:1fr!important}}

@@ -1,0 +1,6 @@
+from typing import Protocol
+
+class BillingProvider(Protocol):
+    """Future boundary for Stripe or another billing provider."""
+    def checkout_url(self,customer_id:str,price_id:str,return_url:str)->str: ...
+    def subscription_state(self,customer_id:str)->dict[str,object]: ...

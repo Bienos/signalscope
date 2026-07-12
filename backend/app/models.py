@@ -1,0 +1,29 @@
+from datetime import datetime
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, JSON, String, Text, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column
+from .db import Base
+
+class Provider(Base):
+    __tablename__="providers"; id:Mapped[int]=mapped_column(primary_key=True); name:Mapped[str]=mapped_column(String(80),unique=True); kind:Mapped[str]=mapped_column(String(30)); enabled:Mapped[bool]=mapped_column(Boolean,default=True)
+class ProviderRun(Base):
+    __tablename__="provider_runs"; id:Mapped[int]=mapped_column(primary_key=True); provider:Mapped[str]=mapped_column(String(80)); started_at:Mapped[datetime]=mapped_column(DateTime); status:Mapped[str]=mapped_column(String(30)); quality:Mapped[dict]=mapped_column(JSON,default=dict); error:Mapped[str|None]=mapped_column(Text,nullable=True)
+class Creator(Base):
+    __tablename__="creators"; id:Mapped[int]=mapped_column(primary_key=True); provider_id:Mapped[str]=mapped_column(String(100),unique=True); username:Mapped[str]=mapped_column(String(100),index=True); display_name:Mapped[str|None]=mapped_column(String(120),nullable=True); region:Mapped[str]=mapped_column(String(8)); followers:Mapped[int]=mapped_column(Integer,default=0); niche:Mapped[str]=mapped_column(String(50)); apparent_minor:Mapped[bool|None]=mapped_column(Boolean,nullable=True); removed:Mapped[bool]=mapped_column(Boolean,default=False)
+class Sound(Base):
+    __tablename__="sounds"; id:Mapped[int]=mapped_column(primary_key=True); provider_id:Mapped[str]=mapped_column(String(100),unique=True); title:Mapped[str]=mapped_column(String(180)); commercial_status:Mapped[str]=mapped_column(String(30),default="unknown"); growth:Mapped[float]=mapped_column(Float,default=0)
+class Video(Base):
+    __tablename__="videos"; id:Mapped[int]=mapped_column(primary_key=True); provider_id:Mapped[str]=mapped_column(String(100),unique=True); url:Mapped[str]=mapped_column(String(300)); creator_id:Mapped[int]=mapped_column(ForeignKey("creators.id")); sound_id:Mapped[int|None]=mapped_column(ForeignKey("sounds.id"),nullable=True); caption:Mapped[str]=mapped_column(Text); hashtags:Mapped[list]=mapped_column(JSON,default=list); published_at:Mapped[datetime]=mapped_column(DateTime,index=True); language:Mapped[str]=mapped_column(String(5)); market:Mapped[str]=mapped_column(String(5)); category:Mapped[str]=mapped_column(String(50)); product_category:Mapped[str|None]=mapped_column(String(80),nullable=True); child_featured:Mapped[bool|None]=mapped_column(Boolean,nullable=True); safety_status:Mapped[str]=mapped_column(String(30),default="clear"); provider:Mapped[str]=mapped_column(String(80)); missing_fields:Mapped[list]=mapped_column(JSON,default=list); removed:Mapped[bool]=mapped_column(Boolean,default=False)
+class Snapshot(Base):
+    __tablename__="video_snapshots"; __table_args__=(UniqueConstraint("video_id","collected_at"),); id:Mapped[int]=mapped_column(primary_key=True); video_id:Mapped[int]=mapped_column(ForeignKey("videos.id"),index=True); collected_at:Mapped[datetime]=mapped_column(DateTime); freshness_at:Mapped[datetime]=mapped_column(DateTime); views:Mapped[int]=mapped_column(Integer); likes:Mapped[int]=mapped_column(Integer); comments:Mapped[int]=mapped_column(Integer); shares:Mapped[int]=mapped_column(Integer); favourites:Mapped[int|None]=mapped_column(Integer,nullable=True); missing_fields:Mapped[list]=mapped_column(JSON,default=list); source:Mapped[str]=mapped_column(String(80))
+class ViralScore(Base):
+    __tablename__="viral_scores"; id:Mapped[int]=mapped_column(primary_key=True); video_id:Mapped[int]=mapped_column(ForeignKey("videos.id"),unique=True); views_growth:Mapped[int]=mapped_column(Integer); views_per_hour:Mapped[float]=mapped_column(Float); acceleration:Mapped[float]=mapped_column(Float); avs:Mapped[float]=mapped_column(Float); evs:Mapped[float]=mapped_column(Float); nps:Mapped[float]=mapped_column(Float); anomaly:Mapped[float]=mapped_column(Float); adjusted:Mapped[float]=mapped_column(Float); confidence:Mapped[str]=mapped_column(String(10)); confidence_score:Mapped[float]=mapped_column(Float,default=0); components:Mapped[dict]=mapped_column(JSON,default=dict); cohort:Mapped[dict]=mapped_column(JSON,default=dict); score_version:Mapped[str]=mapped_column(String(20),default="2.0"); reason:Mapped[str]=mapped_column(Text)
+class TrendCluster(Base):
+    __tablename__="trend_clusters"; id:Mapped[int]=mapped_column(primary_key=True); name:Mapped[str]=mapped_column(String(100)); category:Mapped[str]=mapped_column(String(50)); rfs:Mapped[float]=mapped_column(Float); creators:Mapped[int]=mapped_column(Integer); description:Mapped[str]=mapped_column(Text); adaptation:Mapped[str]=mapped_column(Text)
+class DailyReport(Base):
+    __tablename__="daily_reports"; id:Mapped[int]=mapped_column(primary_key=True); report_date:Mapped[str]=mapped_column(String(10),unique=True); created_at:Mapped[datetime]=mapped_column(DateTime); payload:Mapped[dict]=mapped_column(JSON); status:Mapped[str]=mapped_column(String(20),default="published")
+class DeletionRequest(Base):
+    __tablename__="deletion_requests"; id:Mapped[int]=mapped_column(primary_key=True); target:Mapped[str]=mapped_column(String(150)); reason:Mapped[str]=mapped_column(Text); processed_at:Mapped[datetime]=mapped_column(DateTime); result:Mapped[str]=mapped_column(String(80))
+class SystemSetting(Base):
+    __tablename__="system_settings"; key:Mapped[str]=mapped_column(String(80),primary_key=True); value:Mapped[dict]=mapped_column(JSON)
+class User(Base):
+    __tablename__="users"; id:Mapped[int]=mapped_column(primary_key=True); email:Mapped[str]=mapped_column(String(180),unique=True); password_hash:Mapped[str]=mapped_column(String(300)); role:Mapped[str]=mapped_column(String(20)); active:Mapped[bool]=mapped_column(Boolean,default=True)

@@ -1,0 +1,10 @@
+[
+  "tests/test_core.py::test_append_dedupe_and_scoring",
+  "tests/test_core.py::test_classification_and_negative_filter",
+  "tests/test_core.py::test_commercial_entitlements_require_paid_base_for_addons",
+  "tests/test_core.py::test_complete_report_and_exports",
+  "tests/test_core.py::test_decreasing_metric_anomaly",
+  "tests/test_core.py::test_discovery_states_use_distinct_explained_scores",
+  "tests/test_core.py::test_emerging_eligibility_rejects_unsafe_content",
+  "tests/test_core.py::test_import_headers"
+]
