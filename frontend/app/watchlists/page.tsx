@@ -1,1 +1,2 @@
-import WatchlistsDemo from '../../components/WatchlistsDemo';export const metadata={title:'Watchlists'};export default async function Page({searchParams}:{searchParams:Promise<Record<string,string|undefined>>}){const params=await searchParams;return <WatchlistsDemo initialCategory={params.category||''}/>}
+import {redirect} from 'next/navigation';
+export default function Page() { redirect('/track?tab=watchlists'); }

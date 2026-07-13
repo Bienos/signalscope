@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import cast
 
 from app.config import Settings, settings
+from app.domain.toys import load_toy_taxonomy
 
-from .apify_tiktok import ApifyTikTokProvider
+from .apify import ApifyProviderSettings, ApifyTikTokProvider
 from .base import Provider
 from .generic_rest import GenericRestProvider
 from .mock import MockProvider
@@ -20,20 +21,23 @@ def provider_factory(config: Settings | None = None, *, mock_run: int = 0) -> Pr
     if provider_type == "mock":
         return MockProvider(mock_run)
     if provider_type == "apify":
+        apify_settings = ApifyProviderSettings.from_app_settings(cfg)
+        taxonomy = load_toy_taxonomy()
+        explicit_queries = _split(cfg.apify_search_queries)
+        explicit_hashtags = _split(cfg.apify_hashtags)
+        taxonomy_queries = [
+            term
+            for language in sorted(taxonomy.search_terms)
+            for term in taxonomy.search_terms[language]
+        ]
         return ApifyTikTokProvider(
-            token=cfg.apify_token.get_secret_value(),
-            enabled=cfg.apify_enabled,
-            actor_id=cfg.apify_actor_id,
-            base_url=cfg.apify_api_base_url,
-            search_queries=_split(cfg.apify_search_queries),
-            hashtags=_split(cfg.apify_hashtags),
+            settings=apify_settings,
+            search_queries=explicit_queries or taxonomy_queries,
+            hashtags=explicit_hashtags or list(taxonomy.hashtags),
             profiles=_split(cfg.apify_profiles),
             post_urls=_split(cfg.apify_post_urls),
-            results_per_page=cfg.apify_results_per_page,
             max_items=cfg.apify_max_items,
             max_total_charge_usd=cfg.apify_max_total_charge_usd,
-            timeout_seconds=cfg.apify_timeout_seconds,
-            proxy_country_code=cfg.apify_proxy_country_code,
         )
     if provider_type == "generic_rest":
         return cast(

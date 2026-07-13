@@ -23,17 +23,35 @@ class Settings(BaseSettings):
     provider_field_mapping:dict[str,str]=Field(default_factory=dict)
     apify_enabled:bool=False
     apify_token:SecretStr=SecretStr("")
-    apify_actor_id:str="clockworks~tiktok-scraper"
-    apify_api_base_url:str="https://api.apify.com"
-    apify_search_queries:str="children's toys,STEM toys,sensory toys,collectible toys,construction toys,plush toys,dolls and action figures,outdoor toys,parent toy reviews,gift ideas for kids"
-    apify_hashtags:str="toys,stemtoys,sensorytoys,collectibletoys,constructiontoys,plushtoys,dolls,actionfigures,outdoortoys,toyreview"
+    apify_api_base:str="https://api.apify.com/v2"
+    apify_discovery_actor_id:str="clockworks~tiktok-scraper"
+    apify_profile_actor_id:str="clockworks~tiktok-profile-scraper"
+    apify_profile_enrichment_enabled:bool=False
+    apify_max_results_per_query:int=50
+    apify_default_market:str="GB"
+    apify_supported_markets:str="GB,PL"
+    apify_run_timeout_seconds:int=900
+    apify_request_timeout_seconds:int=60
+    apify_monthly_budget_usd:float=50.0
+    apify_raw_payload_retention_days:int=14
+    toy_discovery_enabled:bool=True
+    toy_monitoring_percentage:int=10
+    toy_provider_mode:str="demo"
+    # Empty values use app/domain/toys/seeds.json. Non-empty environment values
+    # are deliberate run-specific overrides, not a second copy of the taxonomy.
+    apify_search_queries:str=""
+    apify_hashtags:str=""
     apify_profiles:str=""
     apify_post_urls:str=""
-    apify_results_per_page:int=25
-    apify_max_items:int=100
-    apify_max_total_charge_usd:float=2.0
-    apify_timeout_seconds:int=180
-    apify_proxy_country_code:str="None"
+    # Legacy environment names are read for local upgrade compatibility but are
+    # intentionally absent from .env.example. New deployments use the fields above.
+    apify_actor_id:str|None=None
+    apify_api_base_url:str|None=None
+    apify_results_per_page:int|None=None
+    apify_max_items:int|None=None
+    apify_max_total_charge_usd:float|None=None
+    apify_timeout_seconds:int|None=None
+    apify_proxy_country_code:str|None=None
     retention_username_days:int=365
     retention_content_days:int=180
 

@@ -118,3 +118,4 @@ export const policies:LegalPolicy[]=[
 ];
 
 export const policyBySlug=Object.fromEntries(policies.map(policy=>[policy.slug,policy])) as Record<string,LegalPolicy>;
+

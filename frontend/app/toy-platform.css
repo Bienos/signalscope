@@ -1,0 +1,280 @@
+:root {
+  --navy: #0b1220;
+  --ink: #111827;
+  --scope: #0f766e;
+  --signal: #14b8a6;
+  --indigo: #4f46e5;
+  --paper: #f7f8fa;
+  --card: #ffffff;
+  --line: #d8dee8;
+  --muted: #5f6b7a;
+  --deep: var(--navy);
+  --teal: var(--scope);
+  --lime: var(--signal);
+  --pale: #e8f5f3;
+  --warning: #9a6700;
+  --critical: #b42318;
+}
+
+html {overflow-x: hidden;}
+body {background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, sans-serif;}
+h1, h2, h3, h4, .title {font-family: "Inter Tight", Inter, ui-sans-serif, system-ui, sans-serif;}
+.numeric, .toyscore, .detailmetrics strong, .changegrid strong, .reportreadiness dd {font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace; font-variant-numeric: tabular-nums;}
+.main {max-width: 1500px; overflow: visible;}
+
+.nav {background: var(--navy); padding: 22px 18px; border-right: 1px solid #263247;}
+.nav .brand {margin: 0 0 18px; padding: 0; width: 208px; height: 60px; display: flex; align-items: center;}
+.nav .brand img {display: block; width: 208px; height: auto;}
+.nav nav {display: flex; flex-direction: column; gap: 3px;}
+.nav a:not(.brand) {display: flex; flex-direction: column; gap: 1px; padding: 10px 12px; border-radius: 8px; min-height: 52px;}
+.nav a:not(.brand) b {font-family: "Inter Tight", Inter, sans-serif; color: inherit; font-size: 14px;}
+.nav a:not(.brand) small {color: #93a2b7; font-size: 10px;}
+.nav a[aria-current="page"] {background: #18243a; box-shadow: inset 3px 0 var(--signal); color: white;}
+.nav a[aria-current="page"] small {color: #c8d4e4;}
+.demo-nav {color: #bff7ef; border-color: #36516a; background: #101e31;}
+.navfooter {border-color: #263247; color: #93a2b7;}
+.navfooter b {color: white;}
+.navfooter i {background: var(--signal);}
+.navfooter .siteback {color: #73e1d5;}
+
+.globalbar {height: 58px; border-color: var(--line);}
+.globalfresh {display: inline-flex; min-height: 34px; align-items: center; border-radius: 6px; padding: 7px 10px; background: #e8f5f3; color: #0b5f59; font-size: 10px; font-weight: 850; letter-spacing: .06em;}
+.filterchip {background: var(--paper); border-color: var(--line);}
+
+.modebanner {display: grid; grid-template-columns: auto auto auto minmax(240px, 1fr); align-items: center; gap: 10px 16px; margin: 20px 0 26px; padding: 12px 14px; border: 1px solid var(--line); border-left: 4px solid var(--signal); border-radius: 8px; background: white; font-size: 11px;}
+.modebanner strong {font-size: 10px; letter-spacing: .09em; color: var(--scope);}
+.modebanner span {white-space: nowrap;}
+.modebanner small {color: var(--muted);}
+.mode-live {border-left-color: var(--scope);}
+.mode-unavailable {border-left-color: var(--critical);}
+
+.scopebar, .discoverfilters {display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin-top: 22px; padding: 14px; background: white; border: 1px solid var(--line); border-radius: 8px;}
+.scopebar label, .discoverfilters label {display: flex; flex-direction: column; gap: 4px; color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;}
+.scopebar select, .discoverfilters select, .discoverfilters input {min-height: 42px; min-width: 140px; background: white;}
+.discoverfilters label:first-child {flex: 1 1 240px;}
+.discoverfilters label:first-child input {width: 100%;}
+.filteractions {display: flex; align-items: center; gap: 8px;}
+.filteractions a {color: var(--scope); font-weight: 700;}
+
+.briefsection {margin-top: 38px;}
+.sectionhead small {color: var(--muted);}
+.changegrid {display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;}
+.changegrid article {padding: 18px; background: white; border: 1px solid var(--line); border-radius: 8px;}
+.changegrid strong {display: block; color: var(--scope); font-size: 28px;}
+.changegrid h3 {margin: 8px 0 4px; font-size: 15px;}
+.changegrid p {margin: 0; color: var(--muted); font-size: 11px;}
+.decisioncolumns {display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start;}
+.decisioncolumns > section > header {display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;}
+.decisioncolumns > section > header h3 {font-size: 18px; margin: 0;}
+.decisioncolumns > section > header span {min-width: 28px; padding: 4px 8px; border-radius: 99px; text-align: center; background: #e9edf4; font: 700 11px "IBM Plex Mono", monospace;}
+.decisioncolumns .toysignalcard + .toysignalcard {margin-top: 10px;}
+
+.toysignalcard {background: white; border: 1px solid var(--line); border-top: 4px solid var(--scope); border-radius: 8px; padding: 17px; min-width: 0;}
+.toysignalcard.recommendation-monitor {border-top-color: #b98500;}
+.toysignalcard.recommendation-avoid {border-top-color: var(--critical);}
+.toysignalcard > header, .toysignalcard > footer, .entitycard > header, .trackcard > header, .briefcards article > header {display: flex; align-items: center; justify-content: space-between; gap: 10px;}
+.toysignalcard h2 {font-size: 18px; line-height: 1.25; margin: 14px 0 7px;}
+.signalconclusion {color: #344054; margin: 0 0 12px;}
+.signalcontext, .pillrow, .signaltrust, .taglist {display: flex; flex-wrap: wrap; gap: 6px;}
+.signalcontext span, .taglist span {border: 1px solid var(--line); background: #f8fafc; border-radius: 99px; padding: 4px 8px; color: #445065; font-size: 10px;}
+.toyscore {font-size: 11px; font-weight: 800; color: var(--indigo); white-space: nowrap;}
+.whymatters {display: grid; gap: 3px; background: #f5f7fb; padding: 11px; border-left: 3px solid var(--indigo); color: #344054; font-size: 11px;}
+.signalmetrics {display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 14px 0;}
+.signalmetrics div {border: 1px solid var(--line); padding: 8px; min-width: 0;}
+.signalmetrics dt {font-size: 9px; color: var(--muted); text-transform: uppercase;}
+.signalmetrics dd {margin: 3px 0 0; font: 700 11px "IBM Plex Mono", monospace; overflow-wrap: anywhere;}
+.statuspill, .confidencepill, .lifecyclepill {display: inline-flex; align-items: center; gap: 4px; min-height: 26px; border: 1px solid var(--line); border-radius: 99px; padding: 4px 8px; background: white; font-size: 9px; font-weight: 800; white-space: nowrap;}
+.tone-positive {color: #05603a; background: #ecfdf3; border-color: #abefc6;}
+.tone-warning {color: #7a4d00; background: #fffaeb; border-color: #fedf89;}
+.tone-critical {color: #8f1d18; background: #fef3f2; border-color: #fecdca;}
+.tone-neutral {color: #475467; background: #f2f4f7;}
+.confidencepill {color: #263f78; background: #eef4ff; border-color: #c7d7fe;}
+.lifecyclepill {color: #3730a3; background: #eef2ff; border-color: #c7d2fe;}
+.limitation {font-size: 10px; color: var(--muted);}
+.toysignalcard > footer {margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line);}
+.toysignalcard > footer > span {font-size: 10px; color: var(--muted);}
+.toysignalcard .action {margin: 0;}
+
+.pulsegrid {display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border: 1px solid var(--line); background: var(--line); gap: 1px;}
+.pulsegrid article {background: white; padding: 16px;}
+.pulsegrid h3 {font-size: 13px; margin: 0 0 10px;}
+.pulsegrid ol {margin: 0; padding-left: 20px; color: var(--muted); font-size: 11px;}
+.pulsegrid li {margin: 6px 0;}
+.reportreadiness {display: grid; grid-template-columns: 1.3fr 1fr auto; gap: 24px; align-items: center; margin: 38px 0; padding: 22px; background: var(--navy); color: white; border-radius: 8px;}
+.reportreadiness h2 {margin: 5px 0;}
+.reportreadiness p {color: #b6c2d3;}
+.reportreadiness dl {display: grid; grid-template-columns: repeat(3, 1fr); margin: 0;}
+.reportreadiness dl div {padding: 6px 12px; border-left: 1px solid #34435a;}
+.reportreadiness dt {color: #9eacc0; font-size: 9px; text-transform: uppercase;}
+.reportreadiness dd {margin: 4px 0 0; font-size: 20px;}
+
+.lifecycletabs, .tracktabs, .opportunitytabs {display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid var(--line); margin: 22px 0; scrollbar-width: thin;}
+.lifecycletabs a, .tracktabs a, .opportunitytabs a {display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 9px 12px; color: var(--muted); font-size: 11px; font-weight: 750; text-decoration: none; white-space: nowrap; border-bottom: 3px solid transparent;}
+.lifecycletabs a.active, .tracktabs a.active, .opportunitytabs a:hover {color: var(--scope); border-bottom-color: var(--scope);}
+.opportunitytabs b {font-family: "IBM Plex Mono", monospace;}
+.discovertoolbar {display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 18px 0;}
+.discovertoolbar > div {display: inline-flex; border: 1px solid var(--line); border-radius: 8px; padding: 3px; background: white;}
+.discovertoolbar a {padding: 7px 10px; color: var(--muted); text-decoration: none; font-size: 10px; font-weight: 800;}
+.discovertoolbar a.active {background: var(--navy); color: white; border-radius: 5px;}
+.signalcardgrid {display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;}
+
+.table caption {text-align: left; padding: 10px 12px; color: var(--muted); background: white; font-size: 11px; font-weight: 700;}
+.table th.numeric, .table td.numeric, .toysignaltable th:nth-child(n+4):nth-child(-n+6) {text-align: right;}
+.toysignaltable td:first-child {min-width: 230px;}
+.toysignaltable td small, .entitytable td small, .evidencetable td small {display: block; margin-top: 4px; color: var(--muted); font-size: 9px;}
+.tableaction {display: inline-flex; min-height: 38px; align-items: center; color: var(--scope); font-weight: 800; text-decoration: none;}
+
+.trackcard header b {font-size: 10px; color: var(--muted);}
+.trackcard > p, .entitycard > p {color: var(--muted);}
+.trackcard dl, .entitycard dl, .briefcards dl, .qualitylist {font-size: 11px;}
+.trackcard dl div, .entitycard dl div, .briefcards dl div, .qualitylist div {display: grid; grid-template-columns: 1fr 1.2fr; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line);}
+.trackcard dt, .entitycard dt, .briefcards dt, .qualitylist dt {color: var(--muted);}
+.trackcard dd, .entitycard dd, .briefcards dd, .qualitylist dd {margin: 0; text-align: right; overflow-wrap: anywhere;}
+.trackcard aside {display: grid; gap: 4px; margin-top: 12px; padding: 10px; background: #f5f7fb; font-size: 10px;}
+.entitycards {display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;}
+.entitycard a {display: inline-flex; margin-top: 12px; color: var(--scope); font-weight: 800; text-decoration: none;}
+
+.opportunitysection {scroll-margin-top: 80px; margin-top: 36px;}
+.opportunityqueue {display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;}
+.opportunityqueue > article {display: flex; flex-direction: column; padding: 16px; background: white; border: 1px solid var(--line); border-radius: 8px;}
+.opportunityqueue header, .opportunityqueue footer {display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px;}
+.opportunityqueue h3 {font-size: 16px;}
+.opportunityqueue p {color: var(--muted);}
+.opportunityqueue small {display: block; margin: 4px 0;}
+.opportunityqueue footer {margin-top: auto; padding-top: 14px; align-items: center;}
+.opportunityqueue footer > a {color: var(--scope); font-weight: 800;}
+.decisionactions {display: flex; align-items: center; flex-wrap: wrap; gap: 5px;}
+.decisionactions button[aria-pressed="true"] {background: var(--navy); color: white; border-color: var(--navy);}
+.decisionactions span {flex-basis: 100%; color: var(--muted); font-size: 10px;}
+.briefbuilder {scroll-margin-top: 80px; margin: 45px 0; padding: 24px; border-radius: 8px; background: #eef2ff; border: 1px solid #c7d2fe;}
+.briefgrid {display: grid; grid-template-columns: 1fr 1fr; gap: 14px;}
+.briefgrid textarea, .noteworkflow textarea {width: 100%; min-height: 84px; resize: vertical;}
+.briefchecks label {display: flex; align-items: flex-start; gap: 8px; min-height: 40px; padding: 8px 0; border-bottom: 1px solid var(--line);}
+.briefchecks input {margin-top: 3px; accent-color: var(--scope);}
+.briefcards {display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;}
+.briefcards details summary {min-height: 44px; padding: 12px 0; cursor: pointer; font-weight: 750;}
+
+.backlink {display: inline-flex; margin-bottom: 10px; color: var(--scope); font-weight: 750; text-decoration: none;}
+.signaldetailhead {max-width: 980px; padding: 22px 0 30px;}
+.detailconclusion {font-size: 19px; line-height: 1.55; color: #344054;}
+.detailsection {margin: 35px 0;}
+.detaillead {max-width: 900px; font-size: 16px; color: #344054;}
+.detailmetrics {display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;}
+.detailmetrics > div {display: flex; flex-direction: column; gap: 5px; padding: 14px; background: white; border: 1px solid var(--line);}
+.detailmetrics span {font-size: 9px; color: var(--muted); text-transform: uppercase;}
+.detailmetrics strong {font-size: 16px; overflow-wrap: anywhere;}
+.detailtwocolumn {display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 35px 0;}
+.detaillist {border-top: 1px solid var(--line); padding: 9px 0;}
+.detaillist h3 {font-size: 11px; color: var(--muted); text-transform: uppercase;}
+.risksection {margin: 35px 0; padding: 22px; background: #fff8f0; border: 1px solid #f4d6ad; border-radius: 8px;}
+.riskgrid {display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;}
+.riskgrid article {background: white; border: 1px solid #ead8c2; padding: 14px;}
+.riskgrid h3 {font-size: 13px;}
+.riskgrid ul {padding-left: 18px; color: #5e4a32; font-size: 11px;}
+.signalworkflow {margin: 35px 0; padding: 22px; background: var(--navy); color: white; border-radius: 8px;}
+.signalworkflow .decisionactions button {background: #18243a; border-color: #46556c; color: white;}
+.signalworkflow .decisionactions button[aria-pressed="true"] {background: var(--signal); color: var(--navy);}
+.noteworkflow {display: grid; gap: 7px; margin: 18px 0;}
+.noteworkflow textarea {background: #111c2e; border-color: #46556c; color: white;}
+.workflowbuttons {display: flex; flex-wrap: wrap; gap: 8px;}
+.workflowbuttons .action {margin: 0;}
+
+.decisionreport {margin: 26px 0; padding: 28px; background: white; border: 1px solid var(--line); border-radius: 8px;}
+.decisionreport > header {display: flex; justify-content: space-between; gap: 18px; padding-bottom: 18px; border-bottom: 2px solid var(--navy);}
+.decisionreport > header h2 {margin: 8px 0 0;}
+.decisionreport section {padding: 26px 0; border-bottom: 1px solid var(--line);}
+.decisionreport section h3 {font-size: 22px; margin: 8px 0 14px;}
+.reportexecutive {padding: 24px !important; margin-top: 20px; background: #eef2ff; border: 1px solid #c7d2fe !important;}
+.reportexecutive p {font-size: 17px; line-height: 1.6;}
+.reportcards {display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;}
+.reportlimitations {background: #fff8f0; padding: 22px !important;}
+.decisionreport > footer {padding-top: 20px; color: var(--muted);}
+.reportgenerate {display: flex; align-items: center; gap: 8px; flex-wrap: wrap;}
+.reportgenerate span {color: var(--muted); font-size: 11px;}
+
+.methodology ol {display: grid; grid-template-columns: repeat(5, 1fr); list-style: none; padding: 0; border: 1px solid var(--line); background: var(--line); gap: 1px;}
+.methodology li {display: flex; flex-direction: column; gap: 8px; padding: 18px; background: white;}
+.methodology li span {color: var(--muted); font-size: 11px;}
+.settingsgrid {display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0;}
+
+.compactempty {padding: 22px;}
+.empty {border-color: var(--line); border-radius: 8px;}
+.action {background: var(--scope); border-radius: 8px; box-shadow: none;}
+.action:hover {background: #0b625c;}
+.action.secondary {background: #eef2ff; color: var(--indigo);}
+.panel, .card, .table, .report {border-radius: 8px; box-shadow: none;}
+.footerlogo {display: flex; width: 210px; height: 61px; align-items: center;}
+.footerlogo img {display: block; width: 210px; height: auto;}
+button, input, select, textarea {border-color: #cbd3df; border-radius: 6px;}
+button, input, select {min-height: 44px;}
+:focus-visible {outline: 3px solid var(--signal); outline-offset: 3px;}
+
+@media (max-width: 1100px) {
+  .changegrid, .pulsegrid {grid-template-columns: repeat(2, minmax(0, 1fr));}
+  .decisioncolumns, .opportunityqueue, .entitycards {grid-template-columns: 1fr 1fr;}
+  .detailmetrics {grid-template-columns: repeat(3, 1fr);}
+  .methodology ol {grid-template-columns: 1fr 1fr;}
+}
+
+@media (max-width: 900px) {
+  .nav {padding: 13px 16px;}
+  .nav .brand {width: 180px; height: 52px; margin: 0;}
+  .nav .brand img {width: 180px;}
+  .nav nav, .nav .navfooter {display: none;}
+  .nav.mobileopen nav {display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-height: 65vh; overflow: auto; margin-top: 14px;}
+  .nav.mobileopen .navfooter {display: flex;}
+  .nav a:not(.brand) {min-height: 58px;}
+  .modebanner {grid-template-columns: 1fr 1fr;}
+  .modebanner small {grid-column: 1 / 3;}
+  .decisioncolumns {grid-template-columns: 1fr;}
+  .signalcardgrid, .reportcards, .briefcards {grid-template-columns: 1fr;}
+  .pulsegrid {grid-template-columns: repeat(3, 1fr);}
+  .reportreadiness {grid-template-columns: 1fr;}
+  .briefgrid, .detailtwocolumn {grid-template-columns: 1fr;}
+  .riskgrid {grid-template-columns: 1fr 1fr;}
+  .toysignaltable thead, .entitytable thead, .evidencetable thead {position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);}
+  .toysignaltable, .toysignaltable tbody, .entitytable, .entitytable tbody, .evidencetable, .evidencetable tbody {display: block; border: 0; background: transparent;}
+  .toysignaltable tr, .entitytable tr, .evidencetable tr {display: block; margin: 10px 0; padding: 10px 12px; background: white; border: 1px solid var(--line); border-radius: 8px;}
+  .toysignaltable td, .entitytable td, .evidencetable td {display: grid; grid-template-columns: minmax(100px, .7fr) 1.3fr; gap: 10px; min-width: 0 !important; padding: 7px 0; border-bottom: 1px solid #edf0f5; text-align: left !important;}
+  .toysignaltable td::before, .entitytable td::before, .evidencetable td::before {content: attr(data-label); color: var(--muted); font-size: 9px; font-weight: 800; text-transform: uppercase;}
+  .signal-table td:nth-child(10), .signal-table td:nth-child(11) {display: block !important;}
+}
+
+@media (max-width: 700px) {
+  .main {padding: 22px 14px 55px;}
+  .title {font-size: 30px;}
+  .scopebar, .discoverfilters {display: grid; grid-template-columns: 1fr;}
+  .scopebar label, .scopebar select, .discoverfilters label, .discoverfilters select, .discoverfilters input {width: 100%; min-width: 0;}
+  .changegrid, .pulsegrid, .entitycards, .opportunityqueue, .settingsgrid {grid-template-columns: 1fr;}
+  .modebanner {grid-template-columns: 1fr;}
+  .modebanner small {grid-column: auto;}
+  .signalmetrics {grid-template-columns: 1fr 1fr;}
+  .toysignalcard > footer {align-items: flex-start; flex-direction: column;}
+  .discovertoolbar {align-items: flex-start; flex-direction: column;}
+  .detailmetrics {grid-template-columns: 1fr 1fr;}
+  .riskgrid, .methodology ol {grid-template-columns: 1fr;}
+  .reportreadiness dl {grid-template-columns: 1fr 1fr 1fr;}
+  .decisionreport {padding: 16px;}
+  .decisionreport > header {align-items: flex-start; flex-direction: column;}
+  .briefbuilder {padding: 16px;}
+}
+
+@media (max-width: 430px) {
+  .nav.mobileopen nav {grid-template-columns: 1fr;}
+  .globalbar {padding: 8px 10px;}
+  .globalbar .languagepicker, .globalbar .planpreview {display: none;}
+  .globalfresh {display: inline-flex !important;}
+  .detailmetrics {grid-template-columns: 1fr;}
+  .reportreadiness dl {grid-template-columns: 1fr;}
+  .reportreadiness dl div {border-left: 0; border-top: 1px solid #34435a;}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {scroll-behavior: auto !important; animation: none !important; transition: none !important;}
+}
+
+.loginpage{min-height:calc(100vh - 4rem);display:grid;place-items:center;padding:2rem;background:var(--canvas,#f7f8fa)}
+.loginpanel{width:min(100%,30rem);display:grid;gap:1rem;padding:2rem}
+.loginpanel h1,.loginpanel p{margin:0}
+.loginpanel label{display:grid;gap:.4rem;font-weight:700}
+.loginpanel input{min-height:44px;border:1px solid #d8dee8;border-radius:8px;padding:.7rem .8rem;font:inherit}

@@ -395,12 +395,22 @@ def build_full_report(db: Session) -> dict[str, Any]:
     }
 
 
-def generate_report(db: Session) -> DailyReport:
+def generate_report(db: Session, *, user_key: str = "single-user") -> DailyReport:
     today = datetime.utcnow().date().isoformat()
-    report = db.scalar(select(DailyReport).where(DailyReport.report_date == today))
+    report = db.scalar(
+        select(DailyReport).where(
+            DailyReport.report_date == today,
+            DailyReport.user_key == user_key,
+        )
+    )
     payload = build_full_report(db)
     if report is None:
-        report = DailyReport(report_date=today, created_at=datetime.utcnow(), payload=payload)
+        report = DailyReport(
+            report_date=today,
+            user_key=user_key,
+            created_at=datetime.utcnow(),
+            payload=payload,
+        )
     else:
         previous_review = (report.payload or {}).get("review", {})
         payload["review"] = previous_review or payload["review"]

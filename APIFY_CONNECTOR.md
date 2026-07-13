@@ -54,6 +54,9 @@ APIFY_TIMEOUT_SECONDS=180
 APIFY_PROXY_COUNTRY_CODE=None
 ```
 
+Those two lists are optional, explicit overrides. Leave them blank to use the
+versioned toy discovery taxonomy in `backend/app/domain/toys/seeds.json`.
+
 `APIFY_PROFILES` accepts selected usernames. `APIFY_POST_URLS` accepts full TikTok post URLs for
 scheduled refreshes. Comma-separated values are trimmed and de-duplicated. Keep the query and
 hashtag lists inside the approved toy scope.

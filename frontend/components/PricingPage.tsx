@@ -21,3 +21,4 @@ export default function PricingPage(){
   <section className="pricingfaq"><div><h2>Pricing questions</h2>{pricingFaqs.slice(0,2).map(item=><p key={item.question}><b>{item.question}</b><br/>{item.answer}</p>)}</div><div>{pricingFaqs.slice(2).map(item=><p key={item.question}><b>{item.question}</b><br/>{item.answer}</p>)}</div></section>
  </>
 }
+

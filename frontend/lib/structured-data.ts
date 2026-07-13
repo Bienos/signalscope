@@ -11,7 +11,7 @@ export const absoluteUrl=(path='/')=>{const root=siteUrl();return root?new URL(p
 
 const audience={
  '@type':'Audience',
- audienceType:'Social and influencer agencies, multi-brand consumer companies, retail and social-commerce companies, gaming, entertainment, media, beauty, fashion and lifestyle brands'
+ audienceType:'Toy brands, toy retailers, toy distributors and social, creative or influencer agencies serving the children’s toy, family toy and adult toy-collecting markets'
 };
 function offers(root:string){return plans.map(plan=>({
  '@type':'Offer',
@@ -26,12 +26,12 @@ export function homeSchema():JsonLd|null{
  const root=siteUrl();if(!root)return null;
  const offerItems=offers(root);
  return {'@context':'https://schema.org','@graph':[
-  {'@type':'Organization','@id':`${root}/#organization`,name:'SignalScope',url:`${root}/`,description:'Independent provider of evidence-led short-form social trend intelligence for professional teams.',sameAs:['https://t.me/signalsscope']},
-  {'@type':'WebSite','@id':`${root}/#website`,url:`${root}/`,name:'SignalScope',description:'Evidence-led trend intelligence for teams that need to understand what is accelerating, why it matters and where to act next.',publisher:{'@id':`${root}/#organization`},inLanguage:['en','pl','es','fr']},
+  {'@type':'Organization','@id':`${root}/#organization`,name:'SignalScope',url:`${root}/`,description:'Independent provider of evidence-led TikTok toy trend intelligence for professional teams.',sameAs:['https://t.me/signalsscope']},
+  {'@type':'WebSite','@id':`${root}/#website`,url:`${root}/`,name:'SignalScope',description:'Toy trend intelligence for teams that need to understand what is moving, why it matters and what to test next.',publisher:{'@id':`${root}/#organization`},inLanguage:['en','pl','es','fr']},
   {'@type':'OfferCatalog','@id':`${root}/pricing#catalog`,name:'SignalScope indicative launch plans',itemListElement:offerItems},
-  {'@type':'SoftwareApplication','@id':`${root}/#software`,name:'SignalScope',url:`${root}/`,applicationCategory:'BusinessApplication',applicationSubCategory:'Social trend intelligence and creative research',operatingSystem:'Web browser',description:'An evidence-led trend intelligence workspace for professional social, creative, insights, influencer and commerce teams. The current public demonstration uses simulated provider data.',audience,featureList:['Category watchlists','Trend velocity and acceleration analysis','Creator context','Confidence and data-freshness indicators','Act, Monitor and Avoid decisions','Decision-ready reporting'],offers:offerItems,publisher:{'@id':`${root}/#organization`}},
-  {'@type':'Product','@id':`${root}/#product`,name:'SignalScope',url:`${root}/`,description:'A focused alternative to fragmented manual social trend research, combining momentum analysis with confidence, freshness and responsible creative guidance.',audience,isRelatedTo:{'@id':`${root}/#software`},offers:offerItems,brand:{'@id':`${root}/#organization`}},
-  {'@type':'WebPage','@id':`${root}/#webpage`,url:`${root}/`,name:'SignalScope — evidence-led social trend intelligence',isPartOf:{'@id':`${root}/#website`},about:{'@id':`${root}/#product`},description:'Trend intelligence for agencies, brands, insights teams, influencer teams and social-commerce leaders.'},
+  {'@type':'SoftwareApplication','@id':`${root}/#software`,name:'SignalScope',url:`${root}/`,applicationCategory:'BusinessApplication',applicationSubCategory:'TikTok toy trend intelligence and creative research',operatingSystem:'Web browser',description:'An evidence-led toy trend intelligence workspace for toy brands, retailers and agencies. The current public demonstration uses synthetic provider fixtures.',audience,featureList:['Toy category watchlists','Repeated metric observations','Velocity and acceleration analysis','Toy creator, hashtag and sound context','Confidence, freshness and safety indicators','Act, Monitor and Avoid decisions','Source-linked creative briefs','Decision-ready reporting'],offers:offerItems,publisher:{'@id':`${root}/#organization`}},
+  {'@type':'Product','@id':`${root}/#product`,name:'SignalScope',url:`${root}/`,description:'A focused alternative to fragmented manual TikTok toy research, combining momentum evidence with confidence, freshness, safety and responsible creative guidance.',audience,isRelatedTo:{'@id':`${root}/#software`},offers:offerItems,brand:{'@id':`${root}/#organization`}},
+  {'@type':'WebPage','@id':`${root}/#webpage`,url:`${root}/`,name:'SignalScope — evidence-led TikTok toy trend intelligence',isPartOf:{'@id':`${root}/#website`},about:{'@id':`${root}/#product`},description:'Toy trend intelligence for brands, retailers and agencies working across GB and Poland.'},
   faqSchema(publicFaqs,`${root}/#faq`)
  ]};
 }
