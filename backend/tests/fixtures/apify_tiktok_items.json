@@ -1,0 +1,54 @@
+[
+  {
+    "id": "7411111111111111111",
+    "text": "A parent compares three sensory toys for quiet play #sensorytoys #toyreview",
+    "textLanguage": "en",
+    "createTimeISO": "2026-07-12T09:30:00.000Z",
+    "webVideoUrl": "https://www.tiktok.com/@toytester/video/7411111111111111111",
+    "locationCreated": "GB",
+    "authorMeta": {
+      "id": "creator-7411",
+      "name": "toytester",
+      "profileUrl": "https://www.tiktok.com/@toytester",
+      "fans": 12500,
+      "following": 120,
+      "avatar": "https://media.invalid/avatar.jpg"
+    },
+    "musicMeta": {
+      "musicId": "sound-101",
+      "musicName": "Original sound",
+      "musicAuthor": "toytester",
+      "musicOriginal": true,
+      "playUrl": "https://media.invalid/audio.mp3",
+      "coverMediumUrl": "https://media.invalid/sound-cover.jpg"
+    },
+    "videoMeta": {
+      "duration": 19,
+      "downloadAddr": "https://media.invalid/video.mp4",
+      "coverUrl": "https://media.invalid/video-cover.jpg"
+    },
+    "diggCount": 12500,
+    "shareCount": 850,
+    "playCount": 125000,
+    "commentCount": 340,
+    "collectCount": 1200,
+    "hashtags": [
+      {"id": "1", "name": "sensorytoys", "title": "Sensory toys"},
+      {"id": "2", "name": "toyreview", "title": "Toy review"}
+    ],
+    "comments": [{"text": "This must not be mapped"}],
+    "searchQuery": "sensory toys"
+  },
+  {
+    "id": "7422222222222222222",
+    "text": "STEM building challenge #stemtoys",
+    "createTime": 1783846800,
+    "webVideoUrl": "https://www.tiktok.com/@buildandlearn/video/7422222222222222222",
+    "authorMeta": {"id": "creator-7422", "name": "buildandlearn"},
+    "diggCount": 450,
+    "shareCount": 20,
+    "playCount": null,
+    "commentCount": 12,
+    "hashtags": [{"id": "3", "name": "stemtoys", "title": "STEM toys"}]
+  }
+]
