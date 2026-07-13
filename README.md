@@ -1,6 +1,6 @@
 # SignalScope
 
-Private, provider-independent trend intelligence for a monitored sample of TikTok posts. The app never scrapes TikTok or stores video media: it uses deterministic mock data, validated CSV/JSON imports, or a contractually authorised REST provider and displays official links.
+Private, provider-independent trend intelligence for a monitored sample of TikTok toy and family posts. The app stores no TikTok video media: it uses deterministic mock data, validated CSV/JSON imports, a contractually authorised REST provider, or an explicitly enabled Apify adapter and displays official links.
 
 ## Quick start
 
@@ -47,7 +47,7 @@ Run `python -m app.cli collect` at 00:00, 06:00, 12:00 and 18:00; `score` at 07:
 
 ## Licensed provider
 
-Implement the protocol in `app/providers/base.py`, map the vendor's documented contract, preserve provenance/missing fields, and add contract tests. No real-vendor endpoints are invented. See [PROVIDER_INTEGRATION.md](PROVIDER_INTEGRATION.md).
+The disabled-by-default `clockworks~tiktok-scraper` adapter supports scoped toy keyword, hashtag, selected-profile and direct-video-URL collection. It keeps the token in the backend, disables media/comment/transcript/follower-list collection, preserves null metrics and appends immutable snapshots. See [APIFY_CONNECTOR.md](APIFY_CONNECTOR.md) and [PROVIDER_INTEGRATION.md](PROVIDER_INTEGRATION.md).
 
 ## Deployment
 

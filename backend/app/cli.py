@@ -5,6 +5,8 @@ from sqlalchemy import select
 from pwdlib import PasswordHash
 from .db import Base,SessionLocal,engine
 from .models import ProviderRun,TrendCluster,User
+from .config import settings
+from .providers.factory import provider_factory
 from .providers.mock import MockProvider
 from .services.pipeline import ingest,make_report,score_all
 def seed():
@@ -19,9 +21,10 @@ def seed():
 def collect():
     Base.metadata.create_all(engine)
     with SessionLocal() as db:
-        run=ProviderRun(provider="mock",started_at=datetime.utcnow(),status="running",quality={});db.add(run);db.commit()
+        cfg=settings();provider=provider_factory(cfg,mock_run=int(datetime.utcnow().timestamp()//21600)%20);health=provider.health_check()
+        run=ProviderRun(provider=str(health.get("provider",cfg.provider_type)),started_at=datetime.utcnow(),status="running",quality={"health":health});db.add(run);db.commit()
         try:
-            result=ingest(db,MockProvider(int(datetime.utcnow().timestamp()//21600)%20).discover_videos(),datetime.utcnow()); score_all(db);run.status="success";run.quality={**result,"query_success_rate":1,"missing_priority_metrics":0,"market_coverage":["PL","GB","US"],"language_coverage":["en","pl"]}
+            rows=provider.discover_videos();result=ingest(db,rows,datetime.utcnow());score_all(db);run.status="success";run.quality={**result,"query_success_rate":1,"missing_priority_metrics":sum(bool(row.missing_fields) for row in rows),"market_coverage":sorted({row.market for row in rows}),"language_coverage":sorted({row.language for row in rows}),**getattr(provider,"last_run_quality",{})}
         except Exception as e: run.status="failed";run.error=str(e)
         db.commit()
     print(run.status)

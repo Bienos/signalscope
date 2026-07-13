@@ -13,7 +13,7 @@ def emerging_eligibility(db:Session,video:Video,score:ViralScore,now:datetime|No
     checks={
         "age_within_limit":age<=cfg.emerging_max_age_hours,
         "enough_snapshots":len(snapshots)>=2,
-        "below_viral_threshold":bool(latest and latest.views<cfg.viral_view_threshold),
+        "below_viral_threshold":bool(latest and latest.views is not None and latest.views<cfg.viral_view_threshold),
         "minimum_growth":score.views_growth>=cfg.min_emerging_growth,
         "acceptable_anomaly":score.anomaly<=cfg.max_emerging_anomaly,
         "safety_clear":video.safety_status=="clear",

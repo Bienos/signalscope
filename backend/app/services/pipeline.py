@@ -14,16 +14,33 @@ UNSAFE=("niebezpieczne","dangerous challenge","choking","gambling","alcohol","me
 def classify(text:str,hashtags:list[str])->tuple[str,str]:
     s=(text+" "+" ".join(hashtags)).lower()
     if any(x in s for x in UNSAFE): return "safety_review_required","review"
-    if any(x in s for x in ("toy","zabawk","building set")): return "toy","clear"
-    if any(x in s for x in ("family","rodzin","kids activ")): return "family","clear"
-    if "game" in s: return "gaming","clear"
+    if any(x in s for x in ("stem toy","educational toy","learning toy")): return "educational","clear"
+    if any(x in s for x in ("collectible","blind box")): return "collectible","clear"
+    if any(x in s for x in ("parent","family","rodzin","gift for kid","kids activ")): return "family","clear"
+    if any(x in s for x in ("toy","zabawk","building set","construction set","sensory","plush","doll","action figure","outdoor play")): return "toy","clear"
+    if any(x in s for x in ("board game","card game")): return "board_game","clear"
     return "general","clear"
+def product_category(text:str,hashtags:list[str])->str|None:
+    s=(text+" "+" ".join(hashtags)).lower()
+    for terms,label in [
+        (("stem","educational","learning toy"),"Educational & STEM toys"),
+        (("sensory","fidget"),"Sensory toys"),
+        (("collectible","blind box"),"Collectibles"),
+        (("construction","building set","blocks"),"Construction toys"),
+        (("plush","stuffed toy"),"Plush toys"),
+        (("doll","action figure"),"Dolls & action figures"),
+        (("outdoor toy","outdoor play"),"Outdoor toys"),
+        (("parent","gift for kid","gift idea"),"Parent & gift-buyer content"),
+        (("toy","zabawk"),"Children's toys"),
+    ]:
+        if any(term in s for term in terms): return label
+    return None
 def ingest(db:Session, rows:list[ProviderVideo], collected_at:datetime|None=None)->dict:
     now=collected_at or datetime.utcnow(); new=dupes=0
     for r in rows:
         creator=db.scalar(select(Creator).where(Creator.provider_id==r.creator_id))
         if not creator:
-            creator=Creator(provider_id=r.creator_id,username=r.username,display_name=None,region=r.market,followers=5000+(hash(r.creator_id)%500000),niche="toy" if "Toy" in r.caption else "general",apparent_minor=None); db.add(creator); db.flush()
+            creator=Creator(provider_id=r.creator_id,username=r.username,display_name=None,region=r.market if r.provider=="mock" else "ZZ",followers=5000+(hash(r.creator_id)%500000) if r.provider=="mock" else None,niche="toy" if classify(r.caption,r.hashtags)[0] in TOY else "general",apparent_minor=None); db.add(creator); db.flush()
         sound=None
         if r.sound_id:
             sound=db.scalar(select(Sound).where(Sound.provider_id==r.sound_id))
@@ -31,12 +48,18 @@ def ingest(db:Session, rows:list[ProviderVideo], collected_at:datetime|None=None
         video=db.scalar(select(Video).where(Video.provider_id==r.id))
         category,safety=classify(r.caption,r.hashtags)
         if not video:
-            video=Video(provider_id=r.id,url=r.url,creator_id=creator.id,sound_id=sound.id if sound else None,caption=r.caption,hashtags=r.hashtags,published_at=r.published_at,language=r.language,market=r.market,category=category,product_category="Toys & family" if category in TOY else None,child_featured=None,safety_status=safety,provider=r.provider,missing_fields=r.missing_fields); db.add(video); db.flush(); new+=1
-        else: dupes+=1
+            video=Video(provider_id=r.id,url=r.url,creator_id=creator.id,sound_id=sound.id if sound else None,caption=r.caption,hashtags=r.hashtags,published_at=r.published_at,language=r.language,market=r.market,category=category,product_category=product_category(r.caption,r.hashtags),child_featured=None,safety_status=safety,provider=r.provider,raw_reference=r.raw_reference,missing_fields=r.missing_fields); db.add(video); db.flush(); new+=1
+        else:
+            dupes+=1
+            if not video.raw_reference and r.raw_reference: video.raw_reference=r.raw_reference
         if not db.scalar(select(Snapshot).where(Snapshot.video_id==video.id,Snapshot.collected_at==now)):
-            m=r.metrics; db.add(Snapshot(video_id=video.id,collected_at=now,freshness_at=r.freshness_at,views=m.get("views",0),likes=m.get("likes",0),comments=m.get("comments",0),shares=m.get("shares",0),favourites=m.get("favourites"),missing_fields=r.missing_fields,source=r.provider))
+            m=r.metrics; db.add(Snapshot(video_id=video.id,collected_at=now,freshness_at=r.freshness_at,views=m.get("views"),likes=m.get("likes"),comments=m.get("comments"),shares=m.get("shares"),favourites=m.get("favourites"),missing_fields=r.missing_fields,source=r.provider))
     db.commit(); return {"new":new,"duplicates":dupes,"total":len(rows)}
 def _pct(values:list[float],x:float)->float: return 100*sum(v<=x for v in values)/max(1,len(values))
+def _observed(snapshot:Snapshot,field:str)->int:
+    value=getattr(snapshot,field)
+    if value is None: raise ValueError(f"Missing observed metric: {field}")
+    return value
 def _age_band(hours:float)->str:
     for limit,label in [(6,"0-6h"),(12,"6-12h"),(24,"12-24h"),(48,"24-48h"),(72,"48-72h"),(168,"3-7d"),(720,"7-30d")]:
         if hours<=limit:return label
@@ -44,14 +67,15 @@ def _age_band(hours:float)->str:
 def score_all(db:Session)->int:
     calculations:list[dict[str,Any]]=[];now=datetime.utcnow()
     for v in db.scalars(select(Video).where(Video.removed==False)).all():
-        ss=db.scalars(select(Snapshot).where(Snapshot.video_id==v.id).order_by(Snapshot.collected_at)).all()
+        snapshots=db.scalars(select(Snapshot).where(Snapshot.video_id==v.id).order_by(Snapshot.collected_at)).all()
+        ss=[s for s in snapshots if all(getattr(s,field) is not None for field in ("views","likes","comments","shares"))]
         if len(ss)<2: continue
-        hours=max((ss[-1].collected_at-ss[0].collected_at).total_seconds()/3600,.1); growth=ss[-1].views-ss[0].views; velocity=growth/hours
+        hours=max((ss[-1].collected_at-ss[0].collected_at).total_seconds()/3600,.1); growth=_observed(ss[-1],"views")-_observed(ss[0],"views"); velocity=growth/hours
         a=0.0
         if len(ss)>=3:
-            h1=max((ss[-2].collected_at-ss[-3].collected_at).total_seconds()/3600,.1); h2=max((ss[-1].collected_at-ss[-2].collected_at).total_seconds()/3600,.1); a=(ss[-1].views-ss[-2].views)/h2-(ss[-2].views-ss[-3].views)/h1
-        engagement=(ss[-1].likes+ss[-1].comments+ss[-1].shares)/max(ss[-1].views,1); share=ss[-1].shares/max(ss[-1].views,1); jump=70 if growth<0 or growth>max(ss[0].views*5,2_000_000) else 0
-        share_velocity=(ss[-1].shares-ss[0].shares)/hours
+            h1=max((ss[-2].collected_at-ss[-3].collected_at).total_seconds()/3600,.1); h2=max((ss[-1].collected_at-ss[-2].collected_at).total_seconds()/3600,.1); a=(_observed(ss[-1],"views")-_observed(ss[-2],"views"))/h2-(_observed(ss[-2],"views")-_observed(ss[-3],"views"))/h1
+        engagement=(_observed(ss[-1],"likes")+_observed(ss[-1],"comments")+_observed(ss[-1],"shares"))/max(_observed(ss[-1],"views"),1); share=_observed(ss[-1],"shares")/max(_observed(ss[-1],"views"),1); jump=70 if growth<0 or growth>max(_observed(ss[0],"views")*5,2_000_000) else 0
+        share_velocity=(_observed(ss[-1],"shares")-_observed(ss[0],"shares"))/hours
         calculations.append({"video":v,"latest":ss[-1],"growth":growth,"velocity":velocity,"acceleration":a,"engagement":engagement,"share_rate":share,"share_velocity":share_velocity,"anomaly":jump,"snapshots":ss,"age_hours":max(0,(now-v.published_at).total_seconds()/3600)})
     if not calculations:return 0
     creator_velocities:dict[int,list[float]]=defaultdict(list)
