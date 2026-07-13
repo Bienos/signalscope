@@ -19,10 +19,10 @@ class MockProvider:
             out.append(ProviderVideo(id=f"mock-{i:04d}",url=f"https://www.tiktok.com/@radar_creator_{i%36}/video/{7400000000000000000+i}",creator_id=f"creator-{i%36:03d}",username=f"radar_creator_{i%36}",caption=("Niebezpieczne wyzwanie" if unsafe else f"Original mock {hooks[i%len(hooks)]} for {product or cat}"),published_at=now-timedelta(hours=age),language=lang,market=market,metrics={"views":views,"likes":int(views*.08),"comments":int(views*.007),"shares":int(views*(.025 if mode<3 else .009)),"favourites":int(views*.012)},hashtags=tags,sound_id=f"sound-{i%24:03d}",sound_title=f"Observed sound {i%24+1}",provider="mock",raw_reference=f"mock://video/{i}",confidence=.95))
         return out
     def get_video_metrics(self,ids): return {v.id:v.metrics for v in self.discover_videos() if v.id in ids}
+    def refresh_video_urls(self,video_urls): return [v for v in self.discover_videos() if v.url in video_urls]
     def get_creator_profile(self,c): return {"id":c,"provider":"mock"}
     def get_creator_recent_videos(self,c): return [v for v in self.discover_videos() if v.creator_id==c]
     def discover_hashtags(self): return [{"name":f"trend{i}","growth":100-i} for i in range(48)]
     def discover_sounds(self): return [{"id":f"sound-{i:03d}","growth":90-i} for i in range(24)]
     def get_sound_videos(self,s): return [v for v in self.discover_videos() if v.sound_id==s]
     def health_check(self): return {"ok":True,"provider":"mock","freshness":"live simulation"}
-
