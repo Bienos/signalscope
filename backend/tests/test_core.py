@@ -41,3 +41,4 @@ def test_discovery_states_use_distinct_explained_scores():
     assert all_rows and all(x["score_type"]=="AVS" for x in all_rows)
     assert high and len(high)<len(all_rows) and all(x["score"]>=70 and x["current_views"]>=250_000 and x["score_context"]=="High-performing in sample" for x in high)
     assert all(x["score_type"]=="EVS" and x["score_context"]=="Possible emerging" for x in emerging)
+

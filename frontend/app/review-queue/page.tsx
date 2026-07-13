@@ -1,2 +1,2 @@
-import {api} from '../lib';import {FeatureGate} from '../../components/FeatureGate';import {ReviewQueueDemo} from '../../components/ReviewQueueDemo';export const metadata={title:'Review queue'};
-export default async function Page(){const rows=await api<any[]>('/api/videos?state=all&limit=100',[]);const unsafe=rows.filter(x=>x.safety!=='clear');const demo=unsafe.length?unsafe:[rows[0],rows[1]].filter(Boolean);return <FeatureGate feature="review_queue" title="Add team review and approvals" plan="SignalScope Team"><ReviewQueueDemo rows={demo}/></FeatureGate>}
+import {redirect} from 'next/navigation';
+export default function Page() { redirect('/opportunities#needs-review'); }

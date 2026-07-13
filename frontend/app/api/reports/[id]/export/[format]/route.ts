@@ -1,26 +1,8 @@
 import {NextRequest, NextResponse} from 'next/server';
-
-const apiBase = process.env.API_URL || 'http://api:8000';
-
-async function demoToken(): Promise<string> {
-  const body = new URLSearchParams({
-    username: 'admin@viralradar.local',
-    password: 'RadarDemo!2026',
-  });
-  const response = await fetch(`${apiBase}/api/auth/token`, {
-    method: 'POST',
-    body,
-    cache: 'no-store',
-  });
-  if (!response.ok) {
-    throw new Error('Could not authenticate the report download');
-  }
-  const payload = (await response.json()) as {access_token: string};
-  return payload.access_token;
-}
+import {apiBase, requestAuthorization} from '../../../../../../lib/server-session';
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: {params: Promise<{id: string; format: string}>},
 ) {
   try {
@@ -29,11 +11,14 @@ export async function GET(
       return NextResponse.json({detail: 'Invalid report export'}, {status: 400});
     }
 
-    const token = await demoToken();
+    const authorization = requestAuthorization(request);
+    if (!authorization) {
+      return NextResponse.json({detail: 'Sign in to export this report'}, {status: 401});
+    }
     const response = await fetch(
       `${apiBase}/api/reports/${id}/export.${format}`,
       {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: {Authorization: authorization},
         cache: 'no-store',
       },
     );
