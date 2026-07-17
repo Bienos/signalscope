@@ -146,10 +146,12 @@ test('public positioning is category-flexible while the dashboard remains toys-o
     source('app/dashboard/page.tsx'),
     source('lib/seo-content.ts'),
   ]);
-  assert.match(landing, /Social & influencer agencies/);
-  assert.match(landing, /Multi-brand consumer teams/);
-  assert.match(landing, /CURRENT DEMO CATEGORY: TOYS/);
-  assert.match(homeMetadata, /Short-form social trend intelligence/);
+  assert.match(landing, /Short-form intelligence for agencies and consumer teams/);
+  assert.match(landing, /multi-client research/i);
+  assert.match(landing, /Current product preview: toys and family/);
+  assert.doesNotMatch(landing, /LanguageSelector/);
+  assert.doesNotMatch(landing, />Demo</);
+  assert.match(homeMetadata, /Short-form trend intelligence for agencies and consumer teams/);
   assert.match(dashboard, /Toy Market Intelligence/);
   assert.match(dashboard, /Toys &amp; family/);
   assert.match(dashboard, /More categories/);
