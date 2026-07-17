@@ -13,6 +13,12 @@ services:
     depends_on: {db: {condition: service_healthy}}
   web:
     build: ./frontend
-    environment: {API_URL: http://api:8000, NEXT_PUBLIC_API_URL: http://localhost:8000}
+    environment:
+      API_URL: http://api:8000
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      # Local Compose is an explicitly labelled demo. Production deployments
+      # must set this false and use the signed session flow.
+      SIGNALSCOPE_DEMO_MODE: ${SIGNALSCOPE_DEMO_MODE:-true}
+      SIGNALSCOPE_SESSION_COOKIE_SECURE: "false"
     ports: ["3000:3000"]
     depends_on: [api]

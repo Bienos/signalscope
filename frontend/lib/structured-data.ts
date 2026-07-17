@@ -11,7 +11,7 @@ export const absoluteUrl=(path='/')=>{const root=siteUrl();return root?new URL(p
 
 const audience={
  '@type':'Audience',
- audienceType:'Social and influencer agencies, multi-brand consumer companies, retail and social-commerce companies, gaming, entertainment, media, beauty, fashion and lifestyle brands'
+ audienceType:'Social and influencer agencies, multi-brand consumer companies, retail and social-commerce teams, gaming and entertainment companies, and beauty, fashion and lifestyle brands'
 };
 function offers(root:string){return plans.map(plan=>({
  '@type':'Offer',
@@ -26,12 +26,12 @@ export function homeSchema():JsonLd|null{
  const root=siteUrl();if(!root)return null;
  const offerItems=offers(root);
  return {'@context':'https://schema.org','@graph':[
-  {'@type':'Organization','@id':`${root}/#organization`,name:'SignalScope',url:`${root}/`,description:'Independent provider of evidence-led short-form social trend intelligence for professional teams.',sameAs:['https://t.me/signalsscope']},
-  {'@type':'WebSite','@id':`${root}/#website`,url:`${root}/`,name:'SignalScope',description:'Evidence-led trend intelligence for teams that need to understand what is accelerating, why it matters and where to act next.',publisher:{'@id':`${root}/#organization`},inLanguage:['en','pl','es','fr']},
+  {'@type':'Organization','@id':`${root}/#organization`,name:'SignalScope',url:`${root}/`,description:'Independent provider of evidence-led short-form social trend decision intelligence for professional teams.',logo:{'@type':'ImageObject','@id':`${root}/#logo`,url:`${root}/brand/signalscope-mark-teal.png`,contentUrl:`${root}/brand/signalscope-mark-teal.png`,width:150,height:150,caption:'SignalScope'},sameAs:['https://t.me/signalsscope']},
+  {'@type':'WebSite','@id':`${root}/#website`,url:`${root}/`,name:'SignalScope',description:'Short-form opportunity intelligence for agencies and consumer teams that need to understand what is gaining momentum, why it matters and what to do next.',publisher:{'@id':`${root}/#organization`},inLanguage:['en','pl','es','fr']},
   {'@type':'OfferCatalog','@id':`${root}/pricing#catalog`,name:'SignalScope indicative launch plans',itemListElement:offerItems},
-  {'@type':'SoftwareApplication','@id':`${root}/#software`,name:'SignalScope',url:`${root}/`,applicationCategory:'BusinessApplication',applicationSubCategory:'Social trend intelligence and creative research',operatingSystem:'Web browser',description:'An evidence-led trend intelligence workspace for professional social, creative, insights, influencer and commerce teams. The current public demonstration uses simulated provider data.',audience,featureList:['Category watchlists','Trend velocity and acceleration analysis','Creator context','Confidence and data-freshness indicators','Act, Monitor and Avoid decisions','Decision-ready reporting'],offers:offerItems,publisher:{'@id':`${root}/#organization`}},
-  {'@type':'Product','@id':`${root}/#product`,name:'SignalScope',url:`${root}/`,description:'A focused alternative to fragmented manual social trend research, combining momentum analysis with confidence, freshness and responsible creative guidance.',audience,isRelatedTo:{'@id':`${root}/#software`},offers:offerItems,brand:{'@id':`${root}/#organization`}},
-  {'@type':'WebPage','@id':`${root}/#webpage`,url:`${root}/`,name:'SignalScope — evidence-led social trend intelligence',isPartOf:{'@id':`${root}/#website`},about:{'@id':`${root}/#product`},description:'Trend intelligence for agencies, brands, insights teams, influencer teams and social-commerce leaders.'},
+  {'@type':'SoftwareApplication','@id':`${root}/#software`,name:'SignalScope',url:`${root}/`,applicationCategory:'BusinessApplication',applicationSubCategory:'Short-form social trend intelligence and creative research',operatingSystem:'Web browser',description:'An evidence-led short-form opportunity-intelligence workspace for agencies and consumer teams. The current working preview is limited to toys and uses simulated provider data.',audience,featureList:['Category watchlists','Repeated metric observations','Velocity and acceleration analysis','Creator, hashtag and sound context','Confidence, freshness and safety indicators','Act, Monitor and Avoid decisions','Source-linked creative briefs','Decision-ready reporting'],offers:offerItems,publisher:{'@id':`${root}/#organization`}},
+  {'@type':'Product','@id':`${root}/#product`,name:'SignalScope',url:`${root}/`,description:'A focused alternative to fragmented manual short-form social research, combining momentum evidence with confidence, freshness, safety and responsible creative guidance. The current demonstration supports toys only.',image:{'@id':`${root}/#logo`},audience,isRelatedTo:{'@id':`${root}/#software`},offers:offerItems,brand:{'@id':`${root}/#organization`}},
+  {'@type':'WebPage','@id':`${root}/#webpage`,url:`${root}/`,name:'Short-form trend intelligence for agencies and consumer teams',isPartOf:{'@id':`${root}/#website`},about:{'@id':`${root}/#product`},description:'Detect emerging short-form momentum, understand the evidence and turn the strongest opportunities into watchlists, creative briefs and client-ready reports.'},
   faqSchema(publicFaqs,`${root}/#faq`)
  ]};
 }

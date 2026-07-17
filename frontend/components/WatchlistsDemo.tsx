@@ -9,11 +9,11 @@ import {useLocale} from './LocaleProvider';
 type Watchlist={id:string;name:string;category:string;keywords:string;markets:string[];languages:string[];confidence:'High'|'Medium'|'Low'};
 type Draft=Omit<Watchlist,'id'>;
 const storageKey='signalscope-category-watchlists';
-const blank=(category='toys'):Draft=>({name:'',category,keywords:'',markets:['PL'],languages:['en'],confidence:'Medium'});
+const blank=(category='sensory'):Draft=>({name:'',category,keywords:'',markets:['PL'],languages:['en'],confidence:'Medium'});
 
 export default function WatchlistsDemo({initialCategory=''}:{initialCategory?:string}){
  const {plan}=useCommercial();const {locale}=useLocale();const lang=coreLocale(locale);const copy=watchlistCopy[lang];const entitlement=getPlan(plan);const limit=entitlement.quotas.monitors??999;const marketLimit=entitlement.quotas.markets??3;const languageLimit=entitlement.quotas.languages??4;
- const safeInitial=researchCategories.some(x=>x.id===initialCategory)?initialCategory:'toys';
+ const safeInitial=researchCategories.some(x=>x.id===initialCategory)?initialCategory:'sensory';
  const [items,setItems]=useState<Watchlist[]>([]);const [loaded,setLoaded]=useState(false);const [formOpen,setFormOpen]=useState(Boolean(initialCategory));const [draft,setDraft]=useState<Draft>(()=>blank(safeInitial));const [editing,setEditing]=useState<string|null>(null);const [upgrade,setUpgrade]=useState(false);const [pendingDelete,setPendingDelete]=useState<string|null>(null);
  useEffect(()=>{const raw=localStorage.getItem(storageKey);setTimeout(()=>{if(raw){try{const parsed=JSON.parse(raw);if(Array.isArray(parsed))setItems(parsed)}catch{/* Ignore invalid local demo state. */}}setLoaded(true)},0)},[]);
  useEffect(()=>{if(loaded)localStorage.setItem(storageKey,JSON.stringify(items))},[items,loaded]);
