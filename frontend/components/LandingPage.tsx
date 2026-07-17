@@ -111,7 +111,7 @@ export function LandingPage() {
     }}>
       <div className={styles.headerInner}>
         <Link className={styles.logo} href="/" aria-label="SignalScope home" onClick={closeMenu}>
-          <BrandLogo variant="on-light" priority sizes="(max-width: 560px) 166px, 190px"/>
+          <BrandLogo variant="on-dark" priority sizes="(max-width: 560px) 166px, 190px"/>
         </Link>
         <button
           className={styles.menuButton}

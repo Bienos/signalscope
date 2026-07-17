@@ -72,8 +72,8 @@
   position: sticky;
   z-index: 40;
   top: 0;
-  border-bottom: 1px solid rgba(220, 227, 232, .9);
-  background: rgba(255, 255, 255, .96);
+  border-bottom: 1px solid #263449;
+  background: rgba(11, 18, 32, .97);
   backdrop-filter: blur(12px);
 }
 
@@ -109,16 +109,16 @@
 }
 
 .navigation a {
-  color: var(--slate);
+  color: #cbd5e1;
   font-size: 13px;
   font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
 }
 
-.navigation a:hover { color: var(--teal); }
+.navigation a:hover { color: #5eead4; }
 
-.navigation .signIn { margin-left: auto; color: var(--ink); }
+.navigation .signIn { margin-left: auto; color: var(--white); }
 
 .headerCta,
 .primary,
@@ -142,7 +142,18 @@
   color: var(--white);
 }
 
-.navigation .headerCta:hover,
+.navigation .headerCta {
+  border-color: var(--signal);
+  background: var(--signal);
+  color: var(--navy);
+}
+
+.navigation .headerCta:hover {
+  border-color: #5eead4;
+  background: #5eead4;
+  color: var(--navy);
+}
+
 .primary:hover { border-color: #0a615b; background: #0a615b; color: var(--white); }
 
 .secondary {
@@ -157,11 +168,11 @@
   width: 44px;
   height: 44px;
   margin-left: auto;
-  border: 1px solid var(--line);
+  border: 1px solid #3b4a60;
   border-radius: 7px;
   display: none;
-  background: var(--white);
-  color: var(--ink);
+  background: #111c2e;
+  color: var(--white);
   padding: 10px;
 }
 
@@ -413,19 +424,19 @@
     left: 16px;
     max-height: calc(100vh - 90px);
     overflow-y: auto;
-    border: 1px solid var(--line);
+    border: 1px solid #344258;
     border-radius: 8px;
     display: none;
     flex-direction: column;
     align-items: stretch;
     gap: 0;
     padding: 10px;
-    background: var(--white);
+    background: var(--navy);
     box-shadow: 0 16px 36px rgba(11, 18, 32, .14);
   }
   .navigation.menuOpen { display: flex; }
   .navigation a { min-height: 44px; display: flex; align-items: center; padding: 9px 10px; }
-  .navigation .signIn { margin: 6px 0 0; border-top: 1px solid var(--line); }
+  .navigation .signIn { margin: 6px 0 0; border-top: 1px solid #344258; }
   .navigation .headerCta { margin-top: 4px; justify-content: center; }
   .hero { grid-template-columns: 1fr; padding: 64px 0 72px; }
   .hero::before { inset: 44% 0 auto 0; width: 100%; height: 58%; }
