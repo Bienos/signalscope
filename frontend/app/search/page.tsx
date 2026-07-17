@@ -1,3 +1,5 @@
-import {api} from '../lib';import {VideoTable} from '../../components/VideoTable';
-export const metadata={title:'Search'};
-export default async function Page({searchParams}:{searchParams:Promise<{q?:string}>}){const {q=''}=await searchParams;const rows=q?await api<any[]>(`/api/videos?q=${encodeURIComponent(q)}&limit=50`,[]):[];return <><div className="eyebrow">Cross-entity exploration</div><h1 className="title">Search intelligence</h1><p className="subtitle">Search posts and creators. Advanced entity and natural-language search are represented for the demo.</p><form className="searchhero"><input autoFocus name="q" defaultValue={q} placeholder="Try: emerging educational toys in Poland" aria-label="Search intelligence"/><button className="action">Search</button></form>{q?<><p className="resultcount">Results for “{q}” · visible filters can be refined in Discover</p><VideoTable rows={rows}/></>:<div className="empty"><b>Start with a creator, caption, product or research question.</b><p>Example: family-game mechanisms with high adaptation potential</p></div>}</>}
+import {redirect} from 'next/navigation';
+export default async function Page({searchParams}: {searchParams: Promise<{q?: string}>}) {
+  const {q} = await searchParams;
+  redirect(q ? `/discover?q=${encodeURIComponent(q)}` : '/discover');
+}

@@ -1,1 +1,2 @@
-import {redirect} from 'next/navigation';export default function Page(){redirect('/ideas')}
+import {redirect} from 'next/navigation';
+export default function Page() { redirect('/opportunities#creative-briefs'); }
