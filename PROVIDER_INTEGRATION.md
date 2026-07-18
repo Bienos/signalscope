@@ -1,11 +1,11 @@
 # Licensed provider integration
 
 1. Complete legal/procurement review covering collection method, commercial use, retention, deletion and onward display.
-2. Implement every method in `Provider` using only vendor-documented endpoints.
-3. Map responses into `ProviderVideo`/`MetricPoint`; populate retrieval time, provider freshness, confidence, raw reference and missing fields.
-4. Keep secrets in environment/Secret Manager and redact auth headers/query values.
-5. Add fixture-based mapping, timeout, retry, rate-limit, pagination, schema-drift and health tests.
-6. Register the adapter in `provider_factory`; run in shadow mode and compare against manual Creative Center validation before enabling recommendations.
+2. Keep `PROVIDER_TYPE=mock` and `APIFY_ENABLED=false` until the review is complete.
+3. Store `APIFY_TOKEN` only in the backend environment or Secret Manager. Authentication uses a bearer header, never a frontend variable or URL query parameter.
+4. The implemented primary `apidojo/tiktok-scraper-api` contract maps responses into `ProviderVideo`. `clockworks/tiktok-scraper` is a separately mapped fallback used only after retryable primary run or schema failures. Optional hashtag expansion is disabled by default and remains a separate paid operation.
+5. Synthetic fixture tests cover mapping, safety inputs, direct URL refresh, profile discovery, immutable snapshots, null metrics and disabled-by-default behaviour. CI never runs the Actor.
+6. Run a separately authorised, charge-capped smoke test and compare a small sample with manually observed TikTok/Creative Center values before enabling recommendations.
+7. Monitor Actor input/output schema changes. Do not silently map new vendor fields into the domain model.
 
-TODO(provider): vendor name, API documentation, base URL, auth scheme, scopes, quotas, pagination, freshness guarantees, field semantics and licensed retention remain intentionally unspecified.
-
+See [APIFY_CONNECTOR.md](APIFY_CONNECTOR.md) for setup, the exact field map and current limitations. Contractual display, export and retention rights, rate limits and freshness guarantees remain deployment blockers until verified.

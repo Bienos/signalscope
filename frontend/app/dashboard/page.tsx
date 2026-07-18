@@ -1,5 +1,94 @@
-import Link from 'next/link';import {api} from '../lib';import {VideoTable} from '../../components/VideoTable';
-type O={videos:number;creators:number;collection_time?:string;provider_freshness?:string;provider:string;data_mode:string;coverage_warning:string;signals:Record<string,string>};
-export const metadata={title:'Overview'};
-export default async function Page(){const [o,posts,formats,creators]=await Promise.all([api<O>('/api/overview',{videos:0,creators:0,provider:'Unavailable',data_mode:'Unavailable',coverage_warning:'Run migrations and seed data.',signals:{}}),api<any[]>('/api/videos?state=all&limit=8',[]),api<any[]>('/api/formats',[]),api<any[]>('/api/creators',[])]);const safe=posts.filter(x=>x.safety==='clear');const act=safe.find(x=>x.confidence==='High');const monitor=safe.find(x=>x.id!==act?.id&&x.confidence!=='High')||safe.find(x=>x.id!==act?.id);const avoid=posts.find(x=>x.safety!=='clear');const sourceAvailable=o.provider!=='Unavailable'&&Boolean(o.provider_freshness);return <><header className="pagehead"><div><div className="eyebrow">Daily intelligence brief · Europe/Warsaw</div><h1 className="title">What deserves attention today</h1><p className="subtitle">Decision-ready signals from the monitored sample, with evidence quality and limitations kept visible.</p></div><Link className="action" href="/reports">Open daily reports</Link></header><section className="freshness" aria-label="Data freshness and coverage"><span><b>{sourceAvailable?'● Demo source available':'○ Source unavailable'}</b> {o.provider}</span><span><b>Provider freshness</b> {o.provider_freshness?new Date(o.provider_freshness).toLocaleString('en-GB'):'Unavailable'}</span><span><b>Demo dataset</b> PL · GB · US / EN · PL</span><span><b>Mode</b> {o.data_mode}</span></section><div className="decision-grid"><Decision kind="act" title="Act today" item={act} fallback="No eligible high-confidence signal"/><Decision kind="monitor" title="Monitor" item={monitor} fallback="No distinct developing signal"/><Decision kind="avoid" title="Avoid" item={avoid} fallback="No active safety exception"/></div><section className="lead-insight"><div><span className="eyebrow">Strongest interpretation</span><h2>{Object.values(o.signals)[0]||'Evidence is collecting'}</h2><p>Why it matters: this signal combines relative momentum with repeated observations. Treat it as a production hypothesis, not proof of platform-wide demand.</p></div><div className="lead-metrics"><span><b>{o.videos}</b> posts</span><span><b>{o.creators}</b> creators</span><span><b>{safe.length}</b> safe observed signals</span></div></section><section className="sectionhead"><div><span className="eyebrow">Emerging watchlist</span><h2>Momentum with evidence attached</h2></div><Link href="/discover?state=emerging">View possible emerging →</Link></section><VideoTable mode="all" rows={posts.slice(0,6)}/><div className="dashboard-pair"><section className="panel"><span className="eyebrow">Creative mechanisms</span><h2>Mechanism momentum</h2>{formats.slice(0,4).map(x=><div className="momentum" key={x.name}><span>{x.name}<small>{x.category}</small></span><i><b style={{width:`${Math.min(100,x.rfs)}%`}}/></i><strong>RFS {Math.round(x.rfs)}</strong></div>)}</section><section className="panel"><span className="eyebrow">Creator context</span><h2>Outperforming baseline</h2>{creators.slice(0,4).map(x=><div className="creatorline" key={x.username}><span>@{x.username}<small>{x.posts_observed} comparable posts</small></span><strong>{x.baseline_velocity?.toLocaleString()} /hr</strong></div>)}</section></div><div className="notice"><b>Coverage limitation.</b> {o.coverage_warning} All current creator baselines and trend histories are simulated demonstrations.</div></>}
-function Decision({kind,title,item,fallback}:{kind:string;title:string;item:any;fallback:string}){return <article className={`decision ${kind}`}><span>{title}</span>{item?<><h2>{item.caption}</h2><p>@{item.creator} · {item.market} · {Math.round(item.velocity||0).toLocaleString()} views/hour</p><footer><b>{item.score_type||'AVS'} {Math.round(item.score)}</b><em>{item.confidence} confidence</em></footer></>:<p>{fallback}</p>}</article>}
+import Link from 'next/link';
+import {DataModeBanner} from '../../components/toys/DataModeBanner';
+import {SignalCard} from '../../components/toys/SignalCard';
+import {getToyOverview} from '../../lib/toys/api';
+import {displayDateTime} from '../../lib/toys/formatters';
+import type {ToySignal} from '../../lib/toys/types';
+
+export const metadata = {title: 'Today · Toy market intelligence'};
+
+function matches(signal: ToySignal, market: string, language: string, category: string) {
+  return (!market || signal.markets.includes(market))
+    && (!language || signal.languages.includes(language))
+    && (!category || signal.category === category);
+}
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
+  const [overview, params] = await Promise.all([getToyOverview(), searchParams]);
+  const market = params.market || '';
+  const language = params.language || '';
+  const category = params.category || '';
+  const queue = {
+    act: overview.decision_queue.act.filter((signal) => matches(signal, market, language, category)),
+    monitor: overview.decision_queue.monitor.filter((signal) => matches(signal, market, language, category)),
+    avoid: overview.decision_queue.avoid.filter((signal) => matches(signal, market, language, category)),
+  };
+  const categories = Array.from(new Set(Object.values(overview.decision_queue).flat().map((signal) => signal.category))).sort();
+
+  return <>
+    <header className="pagehead toybriefhead">
+      <div><div className="eyebrow">Today · Europe/Warsaw</div><h1 className="title">Toy Market Intelligence</h1><p className="subtitle">What changed, why it matters to the toy market, and what the team should do next.</p></div>
+      <Link className="action" href="/reports">Prepare decision report</Link>
+    </header>
+    <section className="categoryavailability" aria-label="Intelligence category availability">
+      <article className="categoryactive"><span>ACTIVE CATEGORY</span><strong>Toys &amp; family</strong><small>Working demonstration · GB + PL</small></article>
+      <article className="categorycoming"><span>PLANNED EXPANSION</span><strong>More categories</strong><small>Coming soon</small></article>
+    </section>
+    <form className="scopebar" aria-label="Toy brief filters">
+      <label>Market<select name="market" defaultValue={market}><option value="">GB + PL</option><option value="GB">GB</option><option value="PL">PL</option></select></label>
+      <label>Language<select name="language" defaultValue={language}><option value="">English + Polish</option><option value="en">English</option><option value="pl">Polish</option></select></label>
+      <label>Product category<select name="category" defaultValue={category}><option value="">All toy categories</option>{categories.map((item) => <option key={item}>{item}</option>)}</select></label>
+      <label>Date range<select name="range" defaultValue={params.range || '24h'}><option value="24h">Last 24 hours</option><option value="7d">Last 7 days</option></select></label>
+      <button className="action" type="submit">Apply</button>
+    </form>
+    <DataModeBanner
+      mode={overview.mode}
+      modeLabel={overview.mode_label}
+      coverage={overview.coverage}
+      provider={overview.provider.name}
+      lastObservation={overview.provider.last_observation}
+      freshness={overview.provider.freshness_status}
+    />
+
+    <section className="briefsection" aria-labelledby="changes-title">
+      <div className="sectionhead"><div><span className="eyebrow">Since your last review</span><h2 id="changes-title">The important changes</h2></div><small>Last observation {displayDateTime(overview.provider.last_observation)}</small></div>
+      <div className="changegrid">{overview.since_last_review.map((item) => <article key={item.type}><strong>{item.count}</strong><h3>{item.label}</h3><p>{item.detail}</p></article>)}</div>
+    </section>
+
+    <section className="briefsection" aria-labelledby="queue-title">
+      <div className="sectionhead"><div><span className="eyebrow">Decision queue</span><h2 id="queue-title">Act, monitor or avoid</h2></div><Link href="/opportunities">Open all decisions →</Link></div>
+      <div className="decisioncolumns">
+        {(['act', 'monitor', 'avoid'] as const).map((group) => <section key={group} aria-labelledby={`${group}-title`}>
+          <header><h3 id={`${group}-title`}>{group === 'act' ? 'Act' : group === 'monitor' ? 'Monitor' : 'Avoid or hold'}</h3><span>{queue[group].length}</span></header>
+          {queue[group].slice(0, 2).map((signal) => <SignalCard signal={signal} key={signal.id}/>)}
+          {!queue[group].length && <div className="empty compactempty">No matching {group} signals.</div>}
+        </section>)}
+      </div>
+    </section>
+
+    <section className="briefsection" aria-labelledby="pulse-title">
+      <div className="sectionhead"><div><span className="eyebrow">Market pulse</span><h2 id="pulse-title">Where adoption is moving</h2></div><Link href="/discover">Explore evidence →</Link></div>
+      <div className="pulsegrid">
+        <Pulse title="Toy categories" items={overview.market_pulse.categories}/>
+        <Pulse title="Hashtags" items={overview.market_pulse.hashtags}/>
+        <Pulse title="Creators" items={overview.market_pulse.creators}/>
+        <Pulse title="Content mechanisms" items={overview.market_pulse.mechanisms}/>
+        <Pulse title="Sounds in toy content" items={overview.market_pulse.sounds}/>
+      </div>
+    </section>
+
+    <section className="reportreadiness" aria-labelledby="readiness-title">
+      <div><span className="eyebrow">Report readiness</span><h2 id="readiness-title">{overview.report_readiness.status}</h2><p>Complete analyst notes and resolve review items before sharing externally.</p></div>
+      <dl><div><dt>Selected</dt><dd>{overview.report_readiness.opportunities_selected}</dd></div><div><dt>Notes complete</dt><dd>{overview.report_readiness.notes_completed}</dd></div><div><dt>Awaiting review</dt><dd>{overview.report_readiness.awaiting_review}</dd></div></dl>
+      <Link className="action" href="/reports">Continue report</Link>
+    </section>
+  </>;
+}
+
+function Pulse({title, items}: {title: string; items: string[]}) {
+  return <article><h3>{title}</h3><ol>{items.map((item) => <li key={item}>{item}</li>)}</ol></article>;
+}
