@@ -46,6 +46,15 @@ def _confidence(sample: int, complete: bool = True) -> str:
     return "Low"
 
 
+def _observed(snapshot: Snapshot | None, field: str) -> int:
+    if snapshot is None:
+        raise ValueError(f"Missing snapshot for metric: {field}")
+    value = getattr(snapshot, field)
+    if value is None:
+        raise ValueError(f"Missing observed metric: {field}")
+    return value
+
+
 def build_full_report(db: Session) -> dict[str, Any]:
     now = datetime.utcnow()
     rows = db.execute(
@@ -70,21 +79,30 @@ def build_full_report(db: Session) -> dict[str, Any]:
             else 0,
             0.1,
         )
-        like_velocity = ((latest.likes - earliest.likes) / hours) if latest and earliest else 0
-        comment_velocity = ((latest.comments - earliest.comments) / hours) if latest and earliest else 0
-        share_velocity = ((latest.shares - earliest.shares) / hours) if latest and earliest else 0
+        complete_pair = bool(
+            latest
+            and earliest
+            and all(
+                getattr(snapshot, field) is not None
+                for snapshot in (latest, earliest)
+                for field in ("views", "likes", "comments", "shares")
+            )
+        )
+        like_velocity = ((_observed(latest,"likes") - _observed(earliest,"likes")) / hours) if complete_pair else None
+        comment_velocity = ((_observed(latest,"comments") - _observed(earliest,"comments")) / hours) if complete_pair else None
+        share_velocity = ((_observed(latest,"shares") - _observed(earliest,"shares")) / hours) if complete_pair else None
         favourite_velocity = (
-            ((latest.favourites or 0) - (earliest.favourites or 0)) / hours
-            if latest and earliest
-            else 0
+            ((latest.favourites - earliest.favourites) / hours)
+            if latest and earliest and latest.favourites is not None and earliest.favourites is not None
+            else None
         )
         engagement = (
-            (latest.likes + latest.comments + latest.shares) / max(latest.views, 1)
-            if latest
-            else 0
+            (_observed(latest,"likes") + _observed(latest,"comments") + _observed(latest,"shares")) / max(_observed(latest,"views"), 1)
+            if complete_pair
+            else None
         )
-        share_rate = latest.shares / max(latest.views, 1) if latest else 0
-        percentage_growth = score.views_growth / max((latest.views - score.views_growth), 1) if latest else 0
+        share_rate = _observed(latest,"shares") / max(_observed(latest,"views"), 1) if complete_pair else None
+        percentage_growth = score.views_growth / max((_observed(latest,"views") - score.views_growth), 1) if complete_pair else None
         safety = "Review required" if v.safety_status != "clear" else "No automated concern"
         return {
             "video_id": v.provider_id,
@@ -106,14 +124,14 @@ def build_full_report(db: Session) -> dict[str, Any]:
             "favourites": latest.favourites if latest else None,
             "views_gained": score.views_growth,
             "views_per_hour": _round(score.views_per_hour),
-            "like_velocity": _round(like_velocity),
-            "comment_velocity": _round(comment_velocity),
-            "share_velocity": _round(share_velocity),
-            "favourite_velocity": _round(favourite_velocity),
-            "percentage_growth": _round(percentage_growth * 100),
+            "like_velocity": _round(like_velocity) if like_velocity is not None else None,
+            "comment_velocity": _round(comment_velocity) if comment_velocity is not None else None,
+            "share_velocity": _round(share_velocity) if share_velocity is not None else None,
+            "favourite_velocity": _round(favourite_velocity) if favourite_velocity is not None else None,
+            "percentage_growth": _round(percentage_growth * 100) if percentage_growth is not None else None,
             "acceleration": _round(score.acceleration),
-            "engagement_rate": _round(engagement * 100, 2),
-            "share_rate": _round(share_rate * 100, 2),
+            "engagement_rate": _round(engagement * 100, 2) if engagement is not None else None,
+            "share_rate": _round(share_rate * 100, 2) if share_rate is not None else None,
             "already_viral_score": score.avs,
             "emerging_score": score.evs,
             "niche_score": score.nps,
@@ -270,7 +288,11 @@ def build_full_report(db: Session) -> dict[str, Any]:
     missing_shares = sum("shares" in s.missing_fields for s in all_snaps)
     metric_decreases = 0
     for values in snapshots_by_video.values():
-        metric_decreases += sum(b.views < a.views for a, b in zip(values, values[1:]))
+        metric_decreases += sum(
+            b.views < a.views
+            for a, b in zip(values, values[1:])
+            if a.views is not None and b.views is not None
+        )
     provider_runs = db.scalars(select(ProviderRun).order_by(ProviderRun.started_at.desc()).limit(20)).all()
     successful = sum(r.status == "success" for r in provider_runs)
     quality = {
@@ -373,12 +395,22 @@ def build_full_report(db: Session) -> dict[str, Any]:
     }
 
 
-def generate_report(db: Session) -> DailyReport:
+def generate_report(db: Session, *, user_key: str = "single-user") -> DailyReport:
     today = datetime.utcnow().date().isoformat()
-    report = db.scalar(select(DailyReport).where(DailyReport.report_date == today))
+    report = db.scalar(
+        select(DailyReport).where(
+            DailyReport.report_date == today,
+            DailyReport.user_key == user_key,
+        )
+    )
     payload = build_full_report(db)
     if report is None:
-        report = DailyReport(report_date=today, created_at=datetime.utcnow(), payload=payload)
+        report = DailyReport(
+            report_date=today,
+            user_key=user_key,
+            created_at=datetime.utcnow(),
+            payload=payload,
+        )
     else:
         previous_review = (report.payload or {}).get("review", {})
         payload["review"] = previous_review or payload["review"]

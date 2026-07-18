@@ -1,80 +1,370 @@
 'use client';
+
 import Link from 'next/link';
 import {useState} from 'react';
-import {PricingSection} from './PricingSection';
-import {landingNavFor} from '../lib/i18n';
-import {LanguageSelector,useLocale} from './LocaleProvider';
 import {publicFaqs} from '../lib/seo-content';
+import {BrandLogo} from './BrandLogo';
+import {PricingSection} from './PricingSection';
 import baseStyles from './LandingPage.module.css';
 import conversionStyles from './LandingConversion.module.css';
 import faqStyles from './LandingFaq.module.css';
-const styles={...baseStyles,...conversionStyles,...faqStyles};
 
-const signals={
- act:{label:'Act today',title:'Constraint comparison is spreading',score:'EVS 82',confidence:'● High',velocity:'18.6k / hour',note:'Eight unrelated creators adopted the mechanism while velocity continued to rise.',safety:'✓ Clear'},
- monitor:{label:'Monitor',title:'Three-step reveal is gaining speed',score:'EVS 68',confidence:'◐ Medium',velocity:'7.4k / hour',note:'Promising acceleration, but observation history is still short.',safety:'✓ Clear'},
- avoid:{label:'Avoid',title:'Challenge format requires review',score:'Review',confidence:'○ Low',velocity:'12.1k / hour',note:'High reach does not override incomplete evidence and a safety exception.',safety:'! Safety review'}
+const styles = [baseStyles, conversionStyles, faqStyles].reduce<Record<string, string>>((combined, stylesheet) => {
+  Object.entries(stylesheet).forEach(([name, className]) => {
+    combined[name] = [combined[name], className].filter(Boolean).join(' ');
+  });
+  return combined;
+}, {});
+
+type Decision = 'act' | 'monitor' | 'avoid';
+
+const signals: Record<Decision, {
+  label: string;
+  eyebrow: string;
+  title: string;
+  score: string;
+  confidence: string;
+  freshness: string;
+  velocity: string;
+  creators: string;
+  evidence: string;
+  action: string;
+  safety: string;
+}> = {
+  act: {
+    label: 'Act',
+    eyebrow: 'Accelerating mechanism',
+    title: 'Blind-box collection reveals',
+    score: 'TOS 84',
+    confidence: 'High',
+    freshness: '38 min ago',
+    velocity: '18.6k / hour',
+    creators: '8 independent creators',
+    evidence: 'Creator adoption broadened while observed velocity continued to rise across the monitored sample.',
+    action: 'Brief a differentiated reveal concept for client review within 72 hours.',
+    safety: 'No current safety hold',
+  },
+  monitor: {
+    label: 'Monitor',
+    eyebrow: 'Promising, limited evidence',
+    title: 'Screen-free travel activity kits',
+    score: 'TOS 68',
+    confidence: 'Medium',
+    freshness: '1 hr ago',
+    velocity: '6.3k / hour',
+    creators: '4 independent creators',
+    evidence: 'The consumer need is relevant, but the monitored sample is still concentrated among too few creators.',
+    action: 'Recheck creator spread and acceleration at the next scheduled review.',
+    safety: 'No current safety hold',
+  },
+  avoid: {
+    label: 'Avoid',
+    eyebrow: 'Momentum with material risk',
+    title: 'Microwaved sensory-gel challenge',
+    score: 'TOS 31',
+    confidence: 'High',
+    freshness: '24 min ago',
+    velocity: '21.1k / hour',
+    creators: '11 independent creators',
+    evidence: 'Observed reach is high, but the mechanism introduces product-misuse and safety concerns.',
+    action: 'Do not adapt. Record the risk and monitor for adjacent, safer mechanisms.',
+    safety: 'Safety hold',
+  },
 };
-const pains=[
- ['Late signals','The useful testing window closes while teams are still agreeing what matters.'],
- ['Manual research','Strategists lose hours scrolling, saving examples and rebuilding the same evidence.'],
- ['Views without context','A large number cannot tell you whether momentum is growing, flattening or anomalous.'],
- ['Fragmented decisions','Creative, insights, influencer and commerce teams work from different screenshots.']
-];
-const roles=[
- {name:'Agency leaders',headline:'Turn research into a client-facing advantage.',body:'Give every account team a repeatable way to monitor categories, defend recommendations and produce stronger briefs.',outcome:'More credible pitches, retainers and client conversations.'},
- {name:'Social & content',headline:'Give the team a clearer daily direction.',body:'Prioritise what deserves action, what needs more evidence and what should not enter the brief.',outcome:'Less reactive scrolling and faster planning.'},
- {name:'Creative strategy',headline:'Understand the mechanism—not just the execution.',body:'See why momentum is building, then use responsible guidance to develop an original response.',outcome:'More useful inspiration with less imitation risk.'},
- {name:'Consumer insights',headline:'Make emerging behaviour easier to defend.',body:'Keep confidence, freshness, source limitations and category context beside every interpretation.',outcome:'Evidence that can survive stakeholder scrutiny.'},
- {name:'Influencer marketing',headline:'Evaluate creator momentum beyond follower count.',body:'Compare velocity, adoption and baseline performance across a monitored sample.',outcome:'Better-informed creator shortlists and briefs.'},
- {name:'Social commerce',headline:'Connect cultural movement to a commercial decision.',body:'Monitor category, creator, hashtag and sound signals around the markets that matter.',outcome:'Earlier inputs for campaigns and merchandising.'},
- {name:'CMO / VP Marketing',headline:'See what deserves attention without reading the raw feed.',body:'Move from scattered observations to a concise Act, Monitor or Avoid recommendation.',outcome:'Clearer investment conversations across teams.'}
-];
-const industries=[
- {name:'Agencies',body:'Separate client and category watchlists turn one research method into a scalable service.',example:'Example: one view for each client, market or campaign.'},
- {name:'Multi-brand',body:'Compare portfolio categories through one consistent evidence and reporting framework.',example:'Example: shared watchlists across brands and regions.'},
- {name:'Retail & commerce',body:'Follow category demand signals and creative momentum around trading priorities.',example:'Example: connect a rising category to a campaign review.'},
- {name:'Gaming & media',body:'Monitor creator adoption, releases and fast-moving cultural moments.',example:'Example: see whether a mechanic is spreading beyond one community.'},
- {name:'Beauty & lifestyle',body:'Track rapidly changing creator, hashtag and sound behaviour by market.',example:'Example: distinguish early adoption from a saturated pattern.'}
-];
-const comparison=[
- ['Emerging creative signals','Depends on who is searching','Often conversation-led','Prioritised in the monitored sample'],
- ['Momentum evidence','Manual comparisons','Typically volume and sentiment','Velocity and acceleration'],
- ['Confidence & freshness','Rarely recorded','Varies by platform','Attached to each signal'],
- ['Category watchlists','Spreadsheets and saved posts','Broad topic queries','Decision-focused custom views'],
- ['Creative context','Individual interpretation','Often limited','Creators, sounds and hashtags together'],
- ['Reporting','Rebuilt for every brief','Standard dashboards','Decision-ready exports'],
- ['Originality & safety','Separate review','Varies by platform','Built into guidance']
+
+const proofItems = [
+  'Built for multi-client research',
+  'Evidence attached to every recommendation',
+  'Act · Monitor · Avoid',
+  'Client-ready reporting',
 ];
 
-export function LandingPage(){
- const [mode,setMode]=useState<keyof typeof signals>('act');
- const [role,setRole]=useState(0);const [industry,setIndustry]=useState(0);
- const {locale}=useLocale();const nav=landingNavFor(locale);const signal=signals[mode];
- return <div className={styles.site}>
- <header className={styles.header}><Link className={styles.logo} href="/">Signal<span>Scope</span></Link><nav aria-label="Primary navigation"><a href="#product">Product</a><a href="#solutions">Solutions</a><a href="#pricing">{nav.pricing}</a><a href="#trust">Methodology</a><Link href="/dashboard">Sign in</Link></nav><LanguageSelector compact/><Link className={styles.headerCta} href="/dashboard">Explore dashboard</Link></header>
- <main>
-  <section className={styles.hero}><div className={styles.heroCopy}><p className={styles.kicker}>For social, creative and insights leaders</p><h1>Know what is gaining momentum <em>before it becomes yesterday&apos;s trend.</em></h1><p className={styles.lead}>SignalScope turns fragmented short-form social signals into prioritised, evidence-supported decisions—so your team knows what to act on, monitor or avoid.</p><div className={styles.ctas}><Link className={styles.primary} href="/dashboard">Explore dashboard <span>→</span></Link><Link className={styles.secondary} href="/watchlists">Create a watchlist</Link></div><div className={styles.heroProof}><span>For agencies</span><span>For multi-brand teams</span><span>For social commerce</span></div><p className={styles.disclosure}>Interactive product demo using simulated provider data. Coverage is a configured sample, not a complete TikTok ranking.</p></div>
-  <div className={styles.heroVisual} aria-label="Illustrative category watchlist decision brief"><div className={styles.visualHead}><span>Beauty & lifestyle · UK</span><b>Fresh 12 min ago</b></div><div className={styles.watchRow}><span>WATCHLIST 01</span><b>Category momentum brief</b><small>Simulated data</small></div><div className={styles.miniDecisions}><span className={styles.active}>Act today <b>03</b></span><span>Monitor <b>12</b></span><span>Avoid <b>02</b></span></div><div className={styles.heroSignal}><small>ACCELERATING · ILLUSTRATIVE SIGNAL</small><h2>Constraint comparison</h2><p>Adoption across eight unrelated creators</p><div className={styles.chart}>{[16,23,21,32,45,58,76,91].map((h,i)=><i key={i} style={{height:`${h}%`}}/>)}</div><footer><b>EVS 82</b><span>● High confidence</span><span>18.6k views/hour</span></footer></div><aside>Decision context <p>Momentum is still accelerating. Test an original adaptation while the evidence remains strong.</p></aside></div></section>
+const decisionOrder: Decision[] = ['act', 'monitor', 'avoid'];
 
-  <section className={styles.recognition} id="product"><div className={styles.sectionIntro}><p className={styles.kicker}>The cost of the current workflow</p><h2>Your team does not need more content. It needs a clearer reason to act.</h2><p>When evidence lives across feeds, screenshots and spreadsheets, the opportunity can move faster than the decision.</p></div><div className={styles.painGrid}>{pains.map(([title,body],i)=><article key={title}><span>0{i+1}</span><h3>{title}</h3><p>{body}</p></article>)}</div></section>
+const workflow = [
+  ['Detect', 'Surface category-relevant momentum from a configured monitored sample.'],
+  ['Explain', 'Inspect velocity, acceleration, creator adoption, freshness and evidence gaps.'],
+  ['Decide', 'Record Act, Monitor or Avoid with a reason and a practical decision window.'],
+  ['Deliver', 'Turn approved opportunities into original briefs and source-linked reports.'],
+];
 
-  <section className={styles.beforeAfter}><div className={styles.before}><p className={styles.kicker}>Before SignalScope</p><h2>Five steps. No shared answer.</h2>{['Search feeds manually','Save disconnected examples','Compare performance by instinct','Debate whether a signal matters','Rebuild every client or brand report'].map((x,i)=><p key={x}><b>{i+1}</b>{x}</p>)}</div><div className={styles.bridge}><span>FROM<br/>NOISE</span><i>→</i><span>TO A<br/>DECISION</span></div><div className={styles.after}><p className={styles.kicker}>With SignalScope</p><h2>One evidence-led workflow.</h2>{['Monitor chosen categories','Rank evidence by momentum','See confidence and freshness','Align teams around one signal','Export a decision-ready report'].map((x,i)=><p key={x}><b>✓</b>{x}</p>)}</div></section>
+const useCases = [
+  ['Social strategy', 'Prioritise what deserves attention across client categories without rebuilding the research method each time.'],
+  ['Creative strategy', 'Separate a repeatable mechanism from a creator\'s protected expression before writing an original brief.'],
+  ['Consumer insights', 'Give stakeholders an evidence trail with freshness, confidence, provenance and known limitations.'],
+  ['Influencer teams', 'Review creator adoption and momentum in context instead of treating follower count as the decision.'],
+  ['Social commerce', 'Connect category movement to a practical testing window while keeping product and safety risks visible.'],
+  ['Leadership', 'Share a concise decision view that explains what changed, why it matters and what happens next.'],
+];
 
-  <section className={styles.workflow}><div className={styles.sectionIntro}><p className={styles.kicker}>A decision system—not another feed</p><h2>Choose. See. Decide.</h2></div><ol><li><span>01</span><div><h3>Choose what matters</h3><p>Select a category, market, language, keywords and minimum confidence.</p></div><b>Custom watchlist</b></li><li><span>02</span><div><h3>See what is changing</h3><p>Review velocity, acceleration, creators, sounds, hashtags and the evidence behind them.</p></div><b>Prioritised signals</b></li><li><span>03</span><div><h3>Decide what to do</h3><p>Act, monitor, avoid, brief your team or export a structured report.</p></div><b>Clear next action</b></li></ol><Link className={styles.textLink} href="/watchlists">Build your first category watchlist →</Link></section>
+export function LandingPage() {
+  const [mode, setMode] = useState<Decision>('act');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const signal = signals[mode];
 
-  <section className={styles.preview} aria-labelledby="preview-title"><div className={styles.sectionIntro}><p className={styles.kicker}>Try the decision layer</p><h2 id="preview-title">Views tell you what happened. Momentum helps you decide what happens next.</h2></div><div className={styles.switcher} role="tablist" aria-label="Signal status">{(Object.keys(signals) as (keyof typeof signals)[]).map(k=><button role="tab" aria-selected={mode===k} aria-controls="signal-panel" onClick={()=>setMode(k)} key={k}>{signals[k].label}</button>)}</div><article id="signal-panel" role="tabpanel" className={`${styles.signalCard} ${styles[mode]}`}><header><div><small>{signal.label.toUpperCase()}</small><h3>{signal.title}</h3><p>Illustrative signal · 19 hours old · United Kingdom</p></div><span>{signal.safety}</span></header><div className={styles.signalStats}><span><b>{signal.score}</b>Possible emerging score</span><span><b>{signal.confidence}</b>Evidence quality</span><span><b>{signal.velocity}</b>Current velocity</span><div className={styles.sparkline}>{[18,20,27,25,39,51,68,82].map((h,i)=><i key={i} style={{height:`${h}%`}}/>)}</div></div><aside><b>Why it matters</b><p>{signal.note}</p></aside></article><Link className={styles.textLink} href="/dashboard">Open the complete evidence →</Link></section>
+  const closeMenu = () => setMenuOpen(false);
 
-  <section className={styles.solutions} id="solutions"><div className={styles.sectionIntro}><p className={styles.kicker}>Built around the decision you own</p><h2>One evidence base. Different reasons to use it.</h2></div><div className={styles.roleLayout}><div className={styles.roleTabs} role="tablist" aria-label="Benefits by role">{roles.map((item,i)=><button key={item.name} role="tab" aria-selected={role===i} aria-controls="role-panel" onClick={()=>setRole(i)}>{item.name}</button>)}</div><article id="role-panel" role="tabpanel" className={styles.rolePanel}><small>FOR {roles[role].name.toUpperCase()}</small><h3>{roles[role].headline}</h3><p>{roles[role].body}</p><b>{roles[role].outcome}</b><Link href="/dashboard">See the workflow →</Link></article></div>
-  <div className={styles.industryBlock}><h3>Fits the way your organisation works</h3><div className={styles.industryTabs} role="tablist" aria-label="Solutions by industry">{industries.map((item,i)=><button key={item.name} role="tab" aria-selected={industry===i} aria-controls="industry-panel" onClick={()=>setIndustry(i)}>{item.name}</button>)}</div><article id="industry-panel" role="tabpanel"><b>{industries[industry].name}</b><p>{industries[industry].body}</p><small>{industries[industry].example}</small></article></div></section>
+  return <div className={styles.site}>
+    <a className={styles.skipLink} href="#main-content">Skip to content</a>
+    <header className={styles.header} onKeyDown={(event) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    }}>
+      <div className={styles.headerInner}>
+        <Link className={styles.logo} href="/" aria-label="SignalScope home" onClick={closeMenu}>
+          <BrandLogo variant="on-dark" priority sizes="(max-width: 560px) 166px, 190px"/>
+        </Link>
+        <button
+          className={styles.menuButton}
+          type="button"
+          aria-expanded={menuOpen}
+          aria-controls="homepage-navigation"
+          aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <span/><span/><span/>
+        </button>
+        <nav id="homepage-navigation" className={`${styles.navigation} ${menuOpen ? styles.menuOpen : ''}`} aria-label="Primary navigation">
+          <a href="#product" onClick={closeMenu}>Product</a>
+          <a href="#solutions" onClick={closeMenu}>Solutions</a>
+          <a href="#methodology" onClick={closeMenu}>Methodology</a>
+          <a href="#pricing" onClick={closeMenu}>Pricing</a>
+          <Link className={styles.signIn} href="/login" onClick={closeMenu}>Sign in</Link>
+          <Link className={styles.headerCta} href="/dashboard" onClick={closeMenu}>See this week&apos;s signals</Link>
+        </nav>
+      </div>
+    </header>
 
-  <section className={styles.difference}><div className={styles.sectionIntro}><p className={styles.kicker}>Why teams choose a decision layer</p><h2>From searching for trends to evaluating signals.</h2><p>SignalScope complements permitted provider data by organising it around the questions social and creative leaders actually need to answer.</p></div><div className={styles.tableWrap}><table><caption>Workflow comparison</caption><thead><tr><th>Capability</th><th>Manual research</th><th>Traditional social listening</th><th>SignalScope</th></tr></thead><tbody>{comparison.map(row=><tr key={row[0]}>{row.map((cell,i)=><td key={cell} data-label={i===0?'Capability':i===1?'Manual':i===2?'Listening':'SignalScope'}>{i===3&&<span aria-hidden="true">✓ </span>}{cell}</td>)}</tr>)}</tbody></table></div></section>
+    <main id="main-content">
+      <section className={styles.hero} id="product">
+        <div className={styles.heroCopy}>
+          <p className={styles.kicker}>Short-form intelligence for agencies and consumer teams</p>
+          <h1>Turn emerging short-form signals into <em>client-ready decisions.</em></h1>
+          <p className={styles.lead}>SignalScope helps teams identify what is gaining momentum, understand the evidence behind it and turn the strongest opportunities into watchlists, briefs and reports before the decision window closes.</p>
+          <div className={styles.ctas}>
+            <Link className={styles.primary} href="/dashboard">See this week&apos;s signals <span aria-hidden="true">→</span></Link>
+            <Link className={styles.secondary} href="/reports">View a sample report</Link>
+          </div>
+          <p className={styles.disclosure}><b>Current product preview: toys and family.</b> The working dashboard uses simulated provider data to demonstrate the decision workflow. Additional categories are planned, not currently available.</p>
+        </div>
 
-  <section className={styles.trust} id="trust"><div><p className={styles.kicker}>Evidence before excitement</p><h2>A recommendation should show its workings.</h2><p>SignalScope does not promise virality. It separates observed evidence from interpretation and keeps uncertainty visible when judgment is still required.</p><div className={styles.trustLinks}><Link href="/legal/methodology">Methodology</Link><Link href="/legal/ai-disclosure">AI disclosure</Link><Link href="/legal/security">Security</Link><Link href="/legal/privacy">Privacy</Link></div></div><ul><li><b>Observed ≠ interpreted</b><span>Metrics and AI-supported analysis use explicit labels.</span></li><li><b>Confidence attached</b><span>Evidence quality and freshness sit beside the score.</span></li><li><b>Limitations visible</b><span>Coverage and data-quality gaps stay in the workflow.</span></li><li><b>Responsible guidance</b><span>Originality and safety checks support—not replace—human review.</span></li></ul></section>
+        <div className={styles.heroVisual} aria-label="Illustrative SignalScope client watchlist using simulated toy data">
+          <div className={styles.visualHead}>
+            <div><span>Client watchlist</span><b>Toys &amp; family · UK</b></div>
+            <div><span>Freshness</span><b>Updated 07:42</b></div>
+          </div>
+          <div className={styles.previewDisclosure}><span>Simulated data</span><span>Configured sample</span><span>Not a complete ranking</span></div>
+          <div className={styles.visualSummary}>
+            <div><small>Priority signal</small><h2>Blind-box collection reveals</h2><p>Adoption broadened across unrelated creators while momentum continued to rise.</p></div>
+            <span className={styles.actBadge}>Act</span>
+          </div>
+          <div className={styles.visualMetrics}>
+            <span><small>Opportunity</small><b>TOS 84</b></span>
+            <span><small>Confidence</small><b>High</b></span>
+            <span><small>Velocity</small><b>18.6k/h</b></span>
+            <span><small>Creators</small><b>8</b></span>
+          </div>
+          <div className={styles.chartBlock}>
+            <div><span>Observed momentum</span><small>Repeated snapshots</small></div>
+            <div className={styles.lineChart} aria-hidden="true">
+              <svg viewBox="0 0 560 144" preserveAspectRatio="none">
+                <path className={styles.gridLine} d="M0 28H560M0 72H560M0 116H560"/>
+                <path className={styles.areaLine} d="M0 122 C70 120 86 109 126 112 S198 102 238 91 S300 86 346 69 S414 55 456 37 S520 28 560 14 L560 144 L0 144 Z"/>
+                <path className={styles.dataLine} d="M0 122 C70 120 86 109 126 112 S198 102 238 91 S300 86 346 69 S414 55 456 37 S520 28 560 14"/>
+              </svg>
+            </div>
+          </div>
+          <div className={styles.nextAction}><span>Recommended next action</span><p>Brief a differentiated reveal concept for client review within 72 hours.</p></div>
+        </div>
+      </section>
 
-  <section className={styles.report}><div><p className={styles.kicker}>Built for the next stakeholder conversation</p><h2>Turn today&apos;s signals into tomorrow&apos;s brief.</h2><p>Share a structured view of emerging posts, creator momentum, category movement, sounds, hashtags, evidence limitations and recommended next actions.</p><Link className={styles.secondary} href="/reports">View sample report</Link></div><div className={styles.reportSheet}><header>Executive trend brief <span>DEMO</span></header>{['What requires action','Evidence and confidence','Category and creator context','Risks and limitations','Recommended next steps'].map((x,i)=><p key={x}><b>0{i+1}</b>{x}</p>)}<footer>Excel · HTML · Raw CSV</footer></div></section>
-  <section className={styles.faq}><div className={styles.sectionIntro}><p className={styles.kicker}>For teams that need more than views</p><h2>Questions buyers ask before changing their research workflow.</h2><p>SignalScope supports agency client research, multi-brand category monitoring, creator analysis, social-commerce research, creative briefing and executive trend reporting.</p></div><div className={styles.faqList}>{publicFaqs.map(item=><details key={item.question}><summary>{item.question}</summary><p>{item.answer}</p></details>)}</div></section>
-  <PricingSection/>
-  <section className={styles.final}><p className={styles.kicker}>Make trend research repeatable</p><h2>Replace scattered searching with a clearer reason to act.</h2><p>Start with one category watchlist, explore the decision workflow, or review the Team and Enterprise options.</p><div className={styles.ctas}><Link className={styles.primary} href="/dashboard">Explore dashboard →</Link><Link className={styles.secondary} href="/watchlists">Create a watchlist</Link><Link className={styles.secondary} href="/pricing#enterprise">Book a demo</Link></div><small>Demo uses simulated provider data. Live monitoring and automatic alerts require a licensed provider integration.</small></section>
- </main></div>
+      <section className={styles.proofStrip} aria-label="Product value summary">
+        {proofItems.map((item) => <span key={item}>{item}</span>)}
+      </section>
+
+      <section className={styles.recognition} id="problem">
+        <div className={styles.sectionIntro}>
+          <p className={styles.kicker}>The operational problem</p>
+          <h2>Your team is not short of trends. It is short of defensible decisions.</h2>
+          <p>Agency and brand teams repeatedly collect links, compare screenshots and reformat the same research while the useful approval window gets smaller.</p>
+        </div>
+        <div className={styles.painGrid}>
+          <article><span>01</span><h3>Research repeats across clients</h3><p>Useful observations are scattered across feeds, messages and spreadsheets instead of one consistent review method.</p></article>
+          <article><span>02</span><h3>Reach is mistaken for relevance</h3><p>High views do not explain acceleration, creator spread, saturation, safety or the quality of the evidence.</p></article>
+          <article><span>03</span><h3>Recommendations arrive too late</h3><p>By the time evidence is collected, formatted and approved, the practical testing window may have closed.</p></article>
+          <article><span>04</span><h3>Stakeholders need a rationale</h3><p>Clients and leaders need to know what changed, why it matters and what the team should do—not another folder of examples.</p></article>
+        </div>
+      </section>
+
+      <section className={styles.workflow} id="workflow">
+        <div className={styles.sectionIntro}>
+          <p className={styles.kicker}>A repeatable decision system</p>
+          <h2>Detect → Explain → Decide → Deliver</h2>
+          <p>SignalScope structures the work around a decision, while strategists retain responsibility for context, originality and judgement.</p>
+        </div>
+        <ol>{workflow.map(([title, body], index) => <li key={title}><span>0{index + 1}</span><div><h3>{title}</h3><p>{body}</p></div></li>)}</ol>
+      </section>
+
+      <section className={styles.preview} aria-labelledby="decision-example-title">
+        <div className={styles.sectionIntro}>
+          <p className={styles.kicker}>Interactive evidence example</p>
+          <h2 id="decision-example-title">Momentum is evidence—not the decision.</h2>
+          <p>Compare how evidence quality, risk and timing change the recommended response.</p>
+        </div>
+        <div className={styles.switcher} role="tablist" aria-label="Illustrative signal decision">
+          {decisionOrder.map((item) => <button
+            key={item}
+            id={`decision-tab-${item}`}
+            role="tab"
+            type="button"
+            aria-selected={mode === item}
+            aria-controls={`decision-panel-${item}`}
+            tabIndex={mode === item ? 0 : -1}
+            onClick={() => setMode(item)}
+            onKeyDown={(event) => {
+              const currentIndex = decisionOrder.indexOf(item);
+              let nextIndex = currentIndex;
+              if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % decisionOrder.length;
+              else if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + decisionOrder.length) % decisionOrder.length;
+              else if (event.key === 'Home') nextIndex = 0;
+              else if (event.key === 'End') nextIndex = decisionOrder.length - 1;
+              else return;
+              event.preventDefault();
+              const next = decisionOrder[nextIndex];
+              setMode(next);
+              event.currentTarget.parentElement?.querySelector<HTMLButtonElement>(`#decision-tab-${next}`)?.focus();
+            }}
+          >{signals[item].label}</button>)}
+        </div>
+        <article
+          className={`${styles.signalCard} ${styles[mode]}`}
+          id={`decision-panel-${mode}`}
+          role="tabpanel"
+          aria-labelledby={`decision-tab-${mode}`}
+          tabIndex={0}
+        >
+          <header><div><small>{signal.eyebrow}</small><h3>{signal.title}</h3><p>Current toys preview · simulated UK sample</p></div><span>{signal.label}</span></header>
+          <div className={styles.signalStats}>
+            <span><small>Opportunity</small><b>{signal.score}</b></span>
+            <span><small>Confidence</small><b>{signal.confidence}</b></span>
+            <span><small>Freshness</small><b>{signal.freshness}</b></span>
+            <span><small>Velocity</small><b>{signal.velocity}</b></span>
+            <span><small>Adoption</small><b>{signal.creators}</b></span>
+            <span><small>Safety</small><b>{signal.safety}</b></span>
+          </div>
+          <div className={styles.decisionReason}><div><b>Observed evidence</b><p>{signal.evidence}</p></div><div><b>Recommended next action</b><p>{signal.action}</p></div></div>
+        </article>
+      </section>
+
+      <section className={styles.agency} id="solutions">
+        <div className={styles.agencyCopy}>
+          <p className={styles.kicker}>Designed around agency reality</p>
+          <h2>One research method across clients, categories and weekly reporting cycles.</h2>
+          <p>SignalScope reduces collection, sorting and formatting work without replacing the strategist who understands the client, market and creative context.</p>
+          <Link className={styles.textLink} href="/reports">See the report workflow <span aria-hidden="true">→</span></Link>
+        </div>
+        <div className={styles.agencyGrid}>
+          <article><span>Client watchlists</span><p>Keep category, market and client questions separate while using one consistent evidence model.</p></article>
+          <article><span>Weekly intelligence</span><p>Move from recurring research to a clear Act, Monitor and Avoid briefing structure.</p></article>
+          <article><span>Defensible recommendations</span><p>Attach freshness, confidence, provenance, limitations and a decision window to the recommendation.</p></article>
+          <article><span>Original creative briefs</span><p>Translate the repeatable mechanism into a distinct opportunity instead of copying a post.</p></article>
+          <article><span>Stronger client conversations</span><p>Use evidence in pitches, retainers and planning meetings without overstating coverage or certainty.</p></article>
+          <article><span>Less formatting work</span><p>Reuse a structured output across accounts while keeping human review and approval visible.</p></article>
+        </div>
+      </section>
+
+      <section className={styles.useCases} aria-labelledby="use-cases-title">
+        <div className={styles.sectionIntro}>
+          <p className={styles.kicker}>Useful across the decision team</p>
+          <h2 id="use-cases-title">A shared evidence base, shaped for each role.</h2>
+        </div>
+        <div className={styles.useCaseGrid}>{useCases.map(([title, body]) => <article key={title}><h3>{title}</h3><p>{body}</p></article>)}</div>
+      </section>
+
+      <section className={styles.report}>
+        <div className={styles.reportCopy}>
+          <p className={styles.kicker}>Client-ready deliverables</p>
+          <h2>Move from observation to a report somebody can act on.</h2>
+          <p>Lead with the decision, then show the evidence, confidence, freshness, risks and limitations that support it.</p>
+          <ul><li>Executive summary by decision</li><li>Signal and creator evidence</li><li>Original opportunity and safety review</li><li>Sources, provenance and limitations</li></ul>
+          <Link className={styles.secondary} href="/reports">View a sample report</Link>
+        </div>
+        <div className={styles.reportSheet} aria-label="Illustrative client trend decision report">
+          <header><div><span>SignalScope</span><b>Weekly decision brief</b></div><small>Client category · 12 Jul 2026</small></header>
+          <div className={styles.reportSummary}><span>Act <b>3</b></span><span>Monitor <b>5</b></span><span>Avoid <b>3</b></span></div>
+          {['Executive decision summary', 'Priority opportunities', 'Signals to monitor', 'Risks and holds', 'Evidence and limitations'].map((item, index) => <p key={item}><b>0{index + 1}</b><span>{item}</span><i/></p>)}
+          <footer>Decision view · Excel · HTML · CSV</footer>
+        </div>
+      </section>
+
+      <section className={styles.methodology} id="methodology">
+        <div className={styles.sectionIntro}>
+          <p className={styles.kicker}>Methodology, confidence and provenance</p>
+          <h2>Every recommendation should show its workings.</h2>
+          <p>SignalScope organises permitted observations and interpretations. It does not predict virality, provide complete platform coverage or replace human strategic judgement.</p>
+        </div>
+        <div className={styles.methodGrid}>
+          <article><span>01</span><h3>Observed evidence</h3><p>Repeated snapshots preserve movement over time. Missing metrics remain unavailable rather than becoming zero.</p></article>
+          <article><span>02</span><h3>Confidence</h3><p>Evidence completeness, creator spread, freshness and provider health make uncertainty visible.</p></article>
+          <article><span>03</span><h3>Interpretation</h3><p>Why-it-matters analysis and recommended actions remain clearly separate from observed facts.</p></article>
+          <article><span>04</span><h3>Responsible action</h3><p>Originality, safety, rights and brand suitability checks stay connected to the opportunity.</p></article>
+        </div>
+        <div className={styles.trustLinks}><Link href="/legal/methodology">Methodology</Link><Link href="/legal/security">Security</Link><Link href="/legal/privacy">Privacy</Link><Link href="/legal/ai-disclosure">AI disclosure</Link></div>
+        <p className={styles.independence}>SignalScope is an independent product and is not affiliated with TikTok or ByteDance.</p>
+      </section>
+
+      <section className={styles.comparison} aria-labelledby="comparison-title">
+        <div className={styles.sectionIntro}>
+          <p className={styles.kicker}>A focused operating layer</p>
+          <h2 id="comparison-title">Built for the gap between finding a post and making a recommendation.</h2>
+        </div>
+        <div className={styles.tableWrap} role="region" aria-label="Research approach comparison" tabIndex={0}>
+          <table>
+            <caption>Comparison of common short-form research approaches</caption>
+            <thead><tr><th scope="col">Capability</th><th scope="col">Manual research</th><th scope="col">Broad listening tools</th><th scope="col">SignalScope</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Category-relevant momentum</th><td>Collected manually</td><td>Often conversation-led</td><td>Structured signal review</td></tr>
+              <tr><th scope="row">Freshness and confidence</th><td>Inconsistent</td><td>Varies by platform</td><td>Attached to the decision</td></tr>
+              <tr><th scope="row">Act · Monitor · Avoid</th><td>Rebuilt per project</td><td>Not the core workflow</td><td>Central decision model</td></tr>
+              <tr><th scope="row">Original opportunity brief</th><td>Separate task</td><td>Usually separate</td><td>Connected to evidence</td></tr>
+              <tr><th scope="row">Client-ready report</th><td>Formatted manually</td><td>Dashboard export</td><td>Decision-led output</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <PricingSection/>
+
+      <section className={styles.faq}>
+        <div className={styles.sectionIntro}>
+          <p className={styles.kicker}>Buyer questions</p>
+          <h2>Coverage, categories and the decision workflow.</h2>
+          <p>The current working product preview uses simulated toy data. Other categories are planned and should not be treated as available until their data and workflows are implemented.</p>
+        </div>
+        <div className={styles.faqList}>{publicFaqs.map((item) => <details key={item.question}><summary>{item.question}</summary><p>{item.answer}</p></details>)}</div>
+      </section>
+
+      <section className={styles.final}>
+        <p className={styles.kicker}>A clearer answer for the next client meeting</p>
+        <h2>See what changed, why it matters and what the team should do next.</h2>
+        <p>Explore the current toys preview, inspect the evidence and see how a signal becomes a decision-ready report.</p>
+        <div className={styles.ctas}><Link className={styles.primary} href="/dashboard">See this week&apos;s signals <span aria-hidden="true">→</span></Link><Link className={styles.secondary} href="/reports">View a sample report</Link></div>
+        <small>Current preview: toys and family · Simulated data · Additional categories planned.</small>
+      </section>
+    </main>
+    <footer className={styles.homeFooter}>
+      <div className={styles.footerBrand}>
+        <Link href="/" aria-label="SignalScope home"><BrandLogo variant="on-dark" sizes="210px"/></Link>
+        <p>Evidence-led short-form opportunity intelligence for agencies and consumer teams.</p>
+        <span>Independent product · Configured monitored samples · No guaranteed virality</span>
+      </div>
+      <nav className={styles.footerLinks} aria-label="Footer navigation">
+        <div><h2>Product</h2><a href="#product">Overview</a><Link href="/dashboard">Dashboard</Link><a href="#pricing">Pricing</a></div>
+        <div><h2>Company</h2><a href="#solutions">For agencies</a><Link href="/legal/contact">Contact</Link></div>
+        <div><h2>Trust</h2><Link href="/legal/methodology">Methodology</Link><Link href="/legal/security">Security</Link><Link href="/legal/privacy">Privacy</Link></div>
+        <div><h2>Legal</h2><Link href="/legal/terms">Terms</Link><Link href="/legal/cookies">Cookies</Link><Link href="/legal/ai-disclosure">AI disclosure</Link></div>
+        <div><h2>Follow</h2><a href="https://t.me/signalsscope" target="_blank" rel="noopener noreferrer">Telegram <span aria-hidden="true">↗</span></a></div>
+      </nav>
+      <div className={styles.footerBase}><span>© 2026 SignalScope</span><span>Current preview: toys and family · Simulated data</span><span>Not affiliated with TikTok or ByteDance</span></div>
+    </footer>
+  </div>;
 }
